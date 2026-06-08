@@ -1,0 +1,6 @@
+#Canvas {
+  background-size: 30px 30px;
+  background-image:
+    linear-gradient(to right, rgb(185, 184, 184) 0.5px, transparent 1px),
+    linear-gradient(to bottom, rgb(167, 167, 167) 0.5px, transparent 1px);
+}
