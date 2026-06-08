@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import main from "../config/groq.js";
+import main from "./config/groq.js";
 const app = express();
 app.use(
   cors({
@@ -30,5 +30,5 @@ app.use((err, req, res, next) => {
     success: false,
   });
 });
-main()
+main();
 export default app;
