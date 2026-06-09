@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import main from "./config/groq.js";
+
 const app = express();
 app.use(
   cors({
@@ -17,8 +17,11 @@ app.use(cookieParser());
 
 import userRoutes from "./routes/user.route.js";
 import boardRoutes from "./routes/board.route.js";
+import aiRouter from "./routes/ai.routes.js";
+
 app.use("/api/user", userRoutes);
 app.use("/api/boards", boardRoutes);
+app.use("/api/ai", aiRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -30,5 +33,5 @@ app.use((err, req, res, next) => {
     success: false,
   });
 });
-main();
+
 export default app;
