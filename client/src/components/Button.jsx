@@ -5,6 +5,7 @@ export default function Button({
   loading, // when data is fetching from api then the user can not click on button again and again
   textColor = "text-white",
   classname = "",
+  loadingText = "Loading...",
   ...props
 }) {
   return (
@@ -14,7 +15,7 @@ export default function Button({
       type={type}
       {...props}
     >
-      {loading ? "Loading..." : children}
+      {loading ? loadingText : children}
     </button>
   );
 }

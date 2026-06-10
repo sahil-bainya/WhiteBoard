@@ -7,6 +7,11 @@ import SaveButton from "./SaveButton.jsx";
 // import { useArrows } from "./useArrow.js";
 import { SHAPE_CONFIG } from "./shapeConfig.jsx";
 import "./BoardStyle.css";
+import { messCleanup, architectureAssist } from "../../services/aiServices.js";
+import { getElkPositions } from "./elk.js";
+import { Button } from "../";
+// import dagre from "@dagrejs/dagre"
+
 export default function BoardPage() {
   const {
     shapes,
@@ -24,6 +29,7 @@ export default function BoardPage() {
     setIsEditingTitle,
     stageRef,
     transformerRef,
+    getShapeCenter,
     shapeRefs,
     toolbarRef,
     addShape,
@@ -33,12 +39,57 @@ export default function BoardPage() {
     saveTitle,
     stageSize,
     arrows,
+    getShapeEdgePoint,
     connectingFrom,
     setConnectingFrom,
     updateArrowPoints,
     connectShapes,
     removeArrowsForShape,
+    setArrows,
   } = useBoard();
+
+  const [loading, setLoading] = useState(false);
+  const [pendingCleanup, setPendingCleanup] = useState(false);
+
+  const handleAssist = async () => {
+    const result = await architectureAssist(shapes, arrows);
+    console.log(result);
+  };
+
+  const handleCleanup = async () => {
+    setLoading(true);
+    try {
+      const result = await messCleanup(shapes, arrows);
+      const elkNodes = await getElkPositions(shapes, result.edges);
+      console.log(shapes);
+      const updatedShapes = shapes.map((shape) => {
+        const elkNode = elkNodes.find((n) => n.id === shape.id);
+        if (!elkNode) return shape;
+        return {
+          ...shape,
+          x:
+            shape.type === "circle" ? elkNode.x + elkNode.width / 2 : elkNode.x,
+          y:
+            shape.type === "circle"
+              ? elkNode.y + elkNode.height / 2
+              : elkNode.y,
+        };
+      });
+      console.log(updatedShapes);
+      setShapes(updatedShapes);
+      setPendingCleanup(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!pendingCleanup) return;
+    shapes.forEach((shape) => updateArrowPoints(shape.id));
+    setTimeout(() => setPendingCleanup(false), 0);
+  }, [pendingCleanup, shapes, updateArrowPoints]);
 
   const [contextShape, setContextShape] = useState(null);
   // delete key
@@ -104,6 +155,13 @@ export default function BoardPage() {
           <Workflow />
         </button>
         <SaveButton saveBoard={saveBoard} arrows={arrows} />
+        <Button onClick={handleAssist} children="Assist"></Button>
+        <Button
+          onClick={handleCleanup}
+          children="cleanup"
+          loading={loading}
+          loadingText="cleaning..."
+        ></Button>
       </div>
 
       {/* Canvas */}

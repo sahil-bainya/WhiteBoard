@@ -100,43 +100,58 @@ Return ONLY this JSON, nothing else:
 });
 
 const messCleanup = asyncHandler(async (req, res) => {
-  const { shapes } = req.body;
+  const { shapes, arrows } = req.body;
   if (!shapes || shapes.length === 0) {
     throw new APIError(400, "Canvas is empty");
   }
+
   const prompt = `
-You are a diagram layout expert.
-Reorganize these shapes into a clean, readable flow diagram.
+You are a diagram analysis expert.
+Analyze these shapes and return their logical relationships.
 
-CURRENT SHAPES:
-${JSON.stringify(shapes.map((s) => ({ id: s.id, type: s.type, label: s.text || s.type })))}
+SHAPES:
+${JSON.stringify(shapes.map((s) => ({ id: s.id, label: s.text || s.type })))}
 
-Layout Rules:
-- Use a top-to-bottom flow layout
-- Start first shape at x:100, y:80
-- Minimum 120px horizontal gap between shapes
-- Minimum 100px vertical gap between shapes
-- Group related shapes in same row
-- Maximum 3 shapes per row
-- All shapes must be visible — no negative coordinates
+EXISTING CONNECTIONS:
+${JSON.stringify(
+  arrows.map((a) => {
+    const from = shapes.find((s) => s.id === a.from);
+    const to = shapes.find((s) => s.id === a.to);
+    return {
+      from: a.from,
+      fromLabel: from?.text || from?.type,
+      to: a.to,
+      toLabel: to?.text || to?.type,
+    };
+  }),
+)}
+
+Rules:
+- Keep ALL existing connections
+- Add missing logical relationships if any
+- Only use ids from the shapes list above
+- Do not create connections to non-existent shapes
 
 Return ONLY this JSON, nothing else:
 {
-  "shapes": [
-    { "id": "exact_same_id", "x": number, "y": number }
-  ]
+  "nodes": [{ "id": "exact_shape_id", "label": "shape_label" }],
+  "edges": [{ "from": "exact_id", "to": "exact_id" }]
 }
-Every shape from input must appear in output with same id.
+Total nodes must be exactly ${shapes.length}.
 `;
+
   const response = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
   });
+  if (!response) {
+    throw new ApiError(500, "Groq error");
+  }
   const result = JSON.parse(response.choices[0].message.content);
   return res
     .status(200)
-    .json(new ApiResponse(200, result, "Canvas cleaned successfully"));
+    .json(new ApiResponse(200, result, "Logical relations indentified"));
 });
 
 export { architectureAssist, messCleanup };
