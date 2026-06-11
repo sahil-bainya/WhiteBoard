@@ -8,6 +8,7 @@ import {
   deleteBoard,
   updateTitle,
   updateCanvas,
+  updateNotes
 } from "../controllers/board.controller.js";
 const router = Router();
 
@@ -18,4 +19,5 @@ router.route("/:id").get(getBoard);
 router.route("/:id").patch(updateTitle);
 router.route("/:id").delete(deleteBoard);
 router.route("/:id/canvas").patch(updateCanvas);
+router.route("/:id/notes").patch(updateNotes);
 export default router;

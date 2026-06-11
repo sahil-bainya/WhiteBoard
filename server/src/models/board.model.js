@@ -17,6 +17,10 @@ const boardSchema = new Schema(
       type: Array,
       default: [],
     },
+    boardNotes: {
+      type: Array,
+      default: [],
+    },
     arrows: {
       type: Array,
       default: [],

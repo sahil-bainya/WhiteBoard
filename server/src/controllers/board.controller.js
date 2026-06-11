@@ -56,8 +56,8 @@ const deleteBoard = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid board Id");
   }
   const board = await Board.findById(id);
-  if(!board){
-     throw new ApiError(404, "Board Not Found");
+  if (!board) {
+    throw new ApiError(404, "Board Not Found");
   }
   if (!board.owner.equals(req.user._id)) {
     throw new ApiError(400, "You are not the owner of this board");
@@ -96,7 +96,7 @@ const updateTitle = asyncHandler(async (req, res) => {
 
 const updateCanvas = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { canvasData,arrows } = req.body;
+  const { canvasData, arrows } = req.body;
   const board = await Board.findById(id);
   if (!board) throw new ApiError(404, "Board not found");
 
@@ -105,11 +105,27 @@ const updateCanvas = asyncHandler(async (req, res) => {
   }
 
   board.canvasData = canvasData;
-  board.arrows=arrows;
+  board.arrows = arrows;
   await board.save();
   return res
     .status(200)
     .json(new ApiResponse(200, { board }, "Canvas saved successfully"));
+});
+
+const updateNotes = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { boardNotes } = req.body;
+  const board = await Board.findById(id);
+  if (!board) throw new ApiError(404, "Board not found");
+
+  if (!board.owner.equals(req.user._id)) {
+    throw new ApiError(403, "You are not the owner of this board");
+  }
+  board.boardNotes = boardNotes;
+  await board.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { board }, "Notes saved successfully"));
 });
 export {
   createBoard,
@@ -118,4 +134,5 @@ export {
   deleteBoard,
   updateTitle,
   updateCanvas,
+  updateNotes,
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Stage, Layer, Transformer, Arrow } from "react-konva";
-import { Workflow } from "lucide-react";
+import { Workflow, NotebookText } from "lucide-react";
 import { ContextPanel } from "../";
 import { useBoard } from "./useBoard.js";
 import SaveButton from "./SaveButton.jsx";
@@ -10,12 +10,16 @@ import "./BoardStyle.css";
 import { messCleanup, architectureAssist } from "../../services/aiServices.js";
 import { getElkPositions } from "./elk.js";
 import { Button } from "../";
+import AisuggestionPannel from "./AiSuggestionPannel.jsx";
+import NotesPage from "./NotesPage.jsx";
 // import dagre from "@dagrejs/dagre"
 
 export default function BoardPage() {
   const {
     shapes,
     setShapes,
+    addToNotes,
+    boardNotes,
     boardName,
     setBoardName,
     selectedId,
@@ -29,6 +33,7 @@ export default function BoardPage() {
     setIsEditingTitle,
     stageRef,
     transformerRef,
+    removeNotes,
     getShapeCenter,
     shapeRefs,
     toolbarRef,
@@ -50,9 +55,12 @@ export default function BoardPage() {
 
   const [loading, setLoading] = useState(false);
   const [pendingCleanup, setPendingCleanup] = useState(false);
+  const [notesShowing, setNotesShowing] = useState(false);
 
+  const [aiResponse, setAiresponse] = useState(null);
   const handleAssist = async () => {
     const result = await architectureAssist(shapes, arrows);
+    setAiresponse(result);
     console.log(result);
   };
 
@@ -162,6 +170,14 @@ export default function BoardPage() {
           loading={loading}
           loadingText="cleaning..."
         ></Button>
+        <button
+          className={notesShowing ? "bg-amber-400" : "bg-amber-50"}
+          onClick={() => {
+            setNotesShowing((prev) => !prev);
+          }}
+        >
+          <NotebookText />
+        </button>
       </div>
 
       {/* Canvas */}
@@ -243,6 +259,31 @@ export default function BoardPage() {
             }}
           />
         </div>
+      )}
+
+      {aiResponse && (
+        <AisuggestionPannel
+          suggestions={aiResponse.suggestions}
+          summary={aiResponse.summary}
+          diagramType={aiResponse.diagram_type}
+          onClose={() => setAiresponse(null)}
+          onAddToNotes={async () => {
+            const newNote = {
+              id: crypto.randomUUID(),
+              text: `${aiResponse.summary}\n\n${aiResponse.suggestions
+                .map((s) => `• ${s.title}: ${s.message}`)
+                .join("\n")}`,
+            };
+            addToNotes(newNote);
+          }}
+        />
+      )}
+      {notesShowing && (
+        <NotesPage
+          boardNotes={boardNotes}
+          onDelete={(id) => removeNotes(id)}
+          addNotes={addToNotes}
+        />
       )}
     </div>
   );
