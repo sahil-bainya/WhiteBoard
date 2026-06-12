@@ -3,7 +3,7 @@ import Login from "./Login";
 import SignUp from "./SignUp";
 import "./authPage.css";
 
-export default function AuthPage() {
+export default function AuthForm() {
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
 
   return (

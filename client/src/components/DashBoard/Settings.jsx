@@ -1,5 +1,5 @@
 import { ChangePassword, UpdateAvatar, UpdateProfile } from "../";
-export default function SettingsPage() {
+export default function Settings() {
   return (
     <div>
       <h1>Settings</h1>

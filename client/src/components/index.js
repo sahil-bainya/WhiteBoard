@@ -6,16 +6,16 @@ import UpdateProfile from "./DashBoard/UpdateProfile.jsx";
 import ChangePassword from "./DashBoard/ChangePassword.jsx";
 import Header from "./Header/Header.jsx";
 import AuthLayout from "./AuthLayout.jsx";
-import BoardPage from "./BoardPage/BoardPage.jsx";
-import SettingsPage from "./DashBoard/SettingsPage.jsx";
+import Board from "./BoardPage/Board.jsx";
+import Settings from "./DashBoard/Settings.jsx";
 import Dashboard from "./DashBoard/Dashboard.jsx";
 import Login from "./Auth/Login.jsx";
 import ContextPanel from "./BoardPage/ContextPanel.jsx";
 import AppName from "./AppName.jsx";
-import AuthPage from "./Auth/AuthForm.jsx";
+import AuthForm from "./Auth/AuthForm.jsx";
 export {
   Input,
-  AuthPage,
+  AuthForm,
   AppName,
   AuthLayout,
   Button,
@@ -24,8 +24,8 @@ export {
   UpdateAvatar,
   UpdateProfile,
   Header,
-  BoardPage,
-  SettingsPage,
+  Board,
+  Settings,
   Dashboard,
   Login,
   ContextPanel,

@@ -9,7 +9,7 @@ import NotesPage from "./NotesPage.jsx";
 import Toolbar from "./Toolbar.jsx";
 import StageCanvas from "./StageCanvas.jsx";
 
-export default function BoardPage() {
+export default function Board() {
   const {
     shapes,
     setShapes,
