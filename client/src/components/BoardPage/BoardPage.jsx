@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
-import { Stage, Layer, Transformer, Arrow } from "react-konva";
-import { Workflow, NotebookText } from "lucide-react";
 import { ContextPanel } from "../";
 import { useBoard } from "./useBoard.js";
-import SaveButton from "./SaveButton.jsx";
-// import { useArrows } from "./useArrow.js";
-import { SHAPE_CONFIG } from "./shapeConfig.jsx";
 import "./BoardStyle.css";
 import { messCleanup, architectureAssist } from "../../services/aiServices.js";
 import { getElkPositions } from "./elk.js";
-import { Button } from "../";
 import AisuggestionPannel from "./AiSuggestionPannel.jsx";
 import NotesPage from "./NotesPage.jsx";
-// import dagre from "@dagrejs/dagre"
+import Toolbar from "./Toolbar.jsx";
+import StageCanvas from "./StageCanvas.jsx";
 
 export default function BoardPage() {
   const {
@@ -34,7 +29,6 @@ export default function BoardPage() {
     stageRef,
     transformerRef,
     removeNotes,
-    getShapeCenter,
     shapeRefs,
     toolbarRef,
     addShape,
@@ -44,20 +38,20 @@ export default function BoardPage() {
     saveTitle,
     stageSize,
     arrows,
-    getShapeEdgePoint,
     connectingFrom,
     setConnectingFrom,
     updateArrowPoints,
     connectShapes,
     removeArrowsForShape,
-    setArrows,
   } = useBoard();
 
   const [loading, setLoading] = useState(false);
   const [pendingCleanup, setPendingCleanup] = useState(false);
   const [notesShowing, setNotesShowing] = useState(false);
+  const [contextShape, setContextShape] = useState(null);
 
   const [aiResponse, setAiresponse] = useState(null);
+  
   const handleAssist = async () => {
     const result = await architectureAssist(shapes, arrows);
     setAiresponse(result);
@@ -93,25 +87,6 @@ export default function BoardPage() {
     }
   };
 
-  useEffect(() => {
-    if (!pendingCleanup) return;
-    shapes.forEach((shape) => updateArrowPoints(shape.id));
-    setTimeout(() => setPendingCleanup(false), 0);
-  }, [pendingCleanup, shapes, updateArrowPoints]);
-
-  const [contextShape, setContextShape] = useState(null);
-  // delete key
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
-        if (document.activeElement.tagName === "TEXTAREA") return;
-        deleteSelected(selectedId, removeArrowsForShape);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedId]);
-
   const handleShapeClick = (e, id) => {
     if (tool === "connect") {
       if (!connectingFrom) {
@@ -126,124 +101,64 @@ export default function BoardPage() {
     }
   };
 
+  useEffect(() => {
+    if (!pendingCleanup) return;
+    shapes.forEach((shape) => updateArrowPoints(shape.id));
+    setTimeout(() => setPendingCleanup(false), 0);
+  }, [pendingCleanup, shapes, updateArrowPoints]);
+
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+        if (document.activeElement.tagName === "TEXTAREA") return;
+        deleteSelected(selectedId, removeArrowsForShape);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedId]);
+
   return (
     <div>
-      {/* Toolbar */}
       <div ref={toolbarRef}>
-        {error && <p>{error}</p>}
-        {isEditingTitle ? (
-          <input
-            autoFocus
-            value={boardName}
-            onChange={(e) => setBoardName(e.target.value)}
-            onBlur={saveTitle}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                saveTitle();
-                setIsEditingTitle(false);
-              }
-              if (e.key === "Escape") setIsEditingTitle(false);
-            }}
-          />
-        ) : (
-          <h2 onDoubleClick={() => setIsEditingTitle(true)}>{boardName}</h2>
-        )}
-        {Object.entries(SHAPE_CONFIG).map(([type, config]) => (
-          <button key={type} onClick={() => addShape(type)}>
-            {config.icon}
-          </button>
-        ))}
-        <button
-          onClick={() => setTool(tool === "connect" ? "select" : "connect")}
-          style={{
-            background: tool === "connect" ? "#000" : "",
-            color: tool === "connect" ? "#fff" : "",
-          }}
-        >
-          <Workflow />
-        </button>
-        <SaveButton saveBoard={saveBoard} arrows={arrows} />
-        <Button onClick={handleAssist} children="Assist"></Button>
-        <Button
-          onClick={handleCleanup}
-          children="cleanup"
+        <Toolbar
+          error={error} // doubt
           loading={loading}
-          loadingText="cleaning..."
-        ></Button>
-        <button
-          className={notesShowing ? "bg-amber-400" : "bg-amber-50"}
-          onClick={() => {
-            setNotesShowing((prev) => !prev);
-          }}
-        >
-          <NotebookText />
-        </button>
+          handleAssist={handleAssist}
+          handleCleanup={handleCleanup}
+          notesShowing={notesShowing}
+          setNotesShowing={setNotesShowing}
+          boardName={boardName}
+          setBoardName={setBoardName}
+          tool={tool}
+          saveBoard={saveBoard}
+          setTool={setTool}
+          arrows={arrows}
+          addShape={addShape}
+          saveTitle={saveTitle}
+          isEditingTitle={isEditingTitle}
+          setIsEditingTitle={setIsEditingTitle}
+        />
       </div>
 
-      {/* Canvas */}
-      <Stage
-        id="Canvas"
-        width={stageSize.width}
-        height={stageSize.height}
-        ref={stageRef}
-        onMouseDown={(e) => {
-          if (e.target === e.target.getStage()) setSelectedId(null);
-        }}
-      >
-        <Layer>
-          {arrows.map((arrow) => (
-            <Arrow
-              key={arrow.id}
-              points={arrow.points}
-              stroke="#000"
-              fill="#000"
-              strokeWidth={2}
-            />
-          ))}
-          {shapes.map((el) => {
-            const { Component, getProps } = SHAPE_CONFIG[el.type];
-            return (
-              <Component
-                key={el.id}
-                draggable
-                x={el.x || 0}
-                y={el.y || 0}
-                rotation={el.rotation || 0}
-                fill={el.fill}
-                stroke={el.stroke}
-                ref={(node) => (shapeRefs.current[el.id] = node)}
-                onClick={(e) => handleShapeClick(e, el.id)}
-                onDragMove={() => updateArrowPoints(el.id)}
-                onDragEnd={(e) => handleDragEnd(e, el.id, updateArrowPoints)}
-                onTransformEnd={() => handleTransformEnd(el.id)}
-                onDblClick={() =>
-                  el.type === "text"
-                    ? handleTextDblClick(el.id)
-                    : setContextShape(el)
-                }
-                {...getProps(el)}
-              />
-            );
-          })}
-          <Transformer
-            ref={transformerRef}
-            boundBoxFunc={(oldBox, newBox) =>
-              newBox.width < 10 || newBox.height < 10 ? oldBox : newBox
-            }
-            enabledAnchors={
-              shapes.find((s) => s.id === selectedId)?.type === "circle"
-                ? ["top-left", "top-right", "bottom-left", "bottom-right"]
-                : undefined
-            }
-            keepRatio={
-              shapes.find((s) => s.id === selectedId)?.type === "circle"
-            }
-            rotateEnabled={true}
-          />
-        </Layer>
-      </Stage>
+      <StageCanvas
+        stageRef={stageRef}
+        stageSize={stageSize}
+        setSelectedId={setSelectedId}
+        arrows={arrows}
+        shapes={shapes}
+        shapeRefs={shapeRefs}
+        updateArrowPoints={updateArrowPoints}
+        handleDragEnd={handleDragEnd}
+        handleTransformEnd={handleTransformEnd}
+        handleTextDblClick={handleTextDblClick}
+        setContextShape={setContextShape}
+        transformerRef={transformerRef}
+        selectedId={selectedId}
+        handleShapeClick={handleShapeClick}
+      />
 
-      {/* Context Panel */}
       {contextShape && (
         <div>
           <ContextPanel
@@ -278,6 +193,7 @@ export default function BoardPage() {
           }}
         />
       )}
+
       {notesShowing && (
         <NotesPage
           boardNotes={boardNotes}

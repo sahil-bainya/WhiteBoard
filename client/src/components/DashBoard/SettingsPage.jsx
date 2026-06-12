@@ -1,4 +1,4 @@
-import { ChangePassword, UpdateAvatar, UpdateProfile } from "./";
+import { ChangePassword, UpdateAvatar, UpdateProfile } from "../";
 export default function SettingsPage() {
   return (
     <div>

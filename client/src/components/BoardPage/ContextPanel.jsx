@@ -7,7 +7,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
   const [newLink, setNewLink] = useState("");
   const HandleClose = () => {
       onSave({ ...shape, context: { notes, links, code } });
-      onclose();
+      onClose();
   };
   const removeLink = (id) => {
     const updatedLinks = links.filter((link) => link.id !== id);

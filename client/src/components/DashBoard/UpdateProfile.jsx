@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { Input, Button } from "./";
+import { Input, Button } from "../";
 import { useState } from "react";
-import api from "../services/api.js";
+import api from "../../services/api";
 
 export default function UpdateProfile() {
   const {

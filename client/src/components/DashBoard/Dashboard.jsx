@@ -1,9 +1,14 @@
 import { useEffect } from "react";
-import api from "../services/api.js";
+import api from "../../services/api.js";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addBoard, removeBoard, setBoards,updateBoard } from "../store/boardSlice.js";
+import {
+  addBoard,
+  removeBoard,
+  setBoards,
+  updateBoard,
+} from "../../store/boardSlice.js";
 
 export default function Dashboard() {
   const [error, setError] = useState(null);
@@ -60,9 +65,10 @@ export default function Dashboard() {
 
   const saveTitle = async (id) => {
     try {
-      await api.patch(`/boards/${id}`, { title: editingTitle || "Untitled Board"});
+      await api.patch(`/boards/${id}`, {
+        title: editingTitle || "Untitled Board",
+      });
       dispatch(updateBoard({ id, title: editingTitle }));
-      
     } catch (err) {
       setError(err?.response?.data?.message || "Title update failed");
     } finally {
@@ -89,7 +95,7 @@ export default function Dashboard() {
               <input
                 autoFocus
                 value={editingTitle}
-                 onClick={(e) => e.stopPropagation()} 
+                onClick={(e) => e.stopPropagation()}
                 onChange={(e) => setEditingTitle(e.target.value)}
                 onBlur={() => saveTitle(board._id)}
                 onKeyDown={(e) => {
@@ -107,7 +113,15 @@ export default function Dashboard() {
             <button onClick={(e) => handleDelete(e, board._id)}>Delete</button>
             <br />
             <br />
-            <button onClick={(e) => { e.stopPropagation(); setEditingTitle(board.title);setEditingBoardId(board._id)}}>Edit</button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingTitle(board.title);
+                setEditingBoardId(board._id);
+              }}
+            >
+              Edit
+            </button>
             <br />
             <br />
           </div>

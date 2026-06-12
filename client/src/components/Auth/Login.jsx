@@ -1,10 +1,11 @@
 import { useForm } from "react-hook-form";
-import { Input, Button } from "./";
 import { useState } from "react";
-import api from "../services/api.js";
+import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser } from "../store/authSlice.js";
+import { setUser } from "../../store/authSlice";
+import "./authStyle.css";
+
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ export default function Login() {
     register,
     formState: { errors },
   } = useForm();
+
   const login = async (data) => {
     setLoading(true);
     try {
@@ -28,14 +30,17 @@ export default function Login() {
       setLoading(false);
     }
   };
+
   return (
-    <div>
-      <form onSubmit={handleSubmit(login)}>
-        <Input
+    <form className="auth-form-inner" onSubmit={handleSubmit(login)}>
+      <h1>Sign In</h1>
+      <div className="auth-divider" />
+
+      <div className="auth-input-group">
+        <label>Email</label>
+        <input
           type="email"
-          label="Email "
-          placeholder="Email"
-          error={errors.email?.message}
+          placeholder="you@example.com"
           {...register("email", {
             required: "Email is required",
             validate: {
@@ -44,11 +49,14 @@ export default function Login() {
             },
           })}
         />
-        <Input
+        <span className="auth-input-error">{errors.email?.message}</span>
+      </div>
+
+      <div className="auth-input-group">
+        <label>Password</label>
+        <input
           type="password"
-          label="Password "
-          placeholder="Password"
-          error={errors.password?.message}
+          placeholder="••••••••"
           {...register("password", {
             required: "Password is required",
             minLength: {
@@ -57,9 +65,16 @@ export default function Login() {
             },
           })}
         />
-        {error && <p>{error}</p>}
-        <Button type="submit" children="Login" loading={loading} />
-      </form>
-    </div>
+        <span className="auth-input-error">{errors.password?.message}</span>
+      </div>
+
+      <a href="#" className="auth-forgot">Forgot your password?</a>
+
+      {error && <div className="auth-error-box">{error}</div>}
+
+      <button className="auth-submit-btn" type="submit" disabled={loading}>
+        {loading ? "Signing in..." : "Sign In"}
+      </button>
+    </form>
   );
 }

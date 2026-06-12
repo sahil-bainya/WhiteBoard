@@ -5,7 +5,7 @@ import {
   Wrench,
   Pin,
   X,
-  Brain ,
+  Brain,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -36,7 +36,7 @@ export default function AiSuggestionPanel({
     <div>
       <div>
         <div>
-          <Brain  />
+          <Brain />
           <h3>AI Suggestions</h3>
         </div>
         <button onClick={onClose}>

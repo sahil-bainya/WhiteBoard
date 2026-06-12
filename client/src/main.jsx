@@ -10,20 +10,20 @@ import {
 } from "react-router-dom";
 import store from "./store/store.js";
 import {
-  Login,
-  SignUp,
   AuthLayout,
   Dashboard,
   BoardPage,
   SettingsPage,
+  AuthPage,
 } from "./components";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { path: "/login", element: <Login /> },
-      { path: "/register", element: <SignUp /> },
+      { index: true, element: <Navigate to="/login" /> },
+      { path: "/login", element: <AuthPage /> },
+      { path: "/register", element: <AuthPage /> },
       {
         path: "/dashboard",
         element: (
@@ -48,15 +48,15 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
       },
-      { path: "*", element: <Navigate to="/dashboard" /> },
+      { path: "*", element: <Navigate to="/login" /> },
     ],
   },
 ]);
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>,
   // </StrictMode>,
 );
