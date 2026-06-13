@@ -113,3 +113,41 @@ Stage in boardPage
           />
         </Layer>
       </Stage> */}
+
+
+card at dashboard 
+  // <div key={board._id} onClick={() => navigate(`/board/${board._id}`)}>
+          //   {editingBoardId === board._id ? (
+          //     <input
+          //       autoFocus
+          //       value={editingTitle}
+          //       onClick={(e) => e.stopPropagation()}
+          //       onChange={(e) => setEditingTitle(e.target.value)}
+          //       onBlur={() => saveTitle(board._id)}
+          //       onKeyDown={(e) => {
+          //         if (e.key === "Enter") {
+          //           saveTitle(board._id);
+          //           setEditingBoardId(null);
+          //         }
+          //         if (e.key === "Escape") setEditingBoardId(null); // ✅ changes discard
+          //       }}
+          //     />
+          //   ) : (
+          //     <h3>{board.title}</h3>
+          //   )}
+          //   <p>{new Date(board.createdAt).toLocaleDateString()}</p>
+          //   <button onClick={(e) => handleDelete(e, board._id)}>Delete</button>
+          //   <br />
+          //   <br />
+          //   <button
+          //     onClick={(e) => {
+          //       e.stopPropagation();
+          //       setEditingTitle(board.title);
+          //       setEditingBoardId(board._id);
+          //     }}
+          //   >
+          //     Edit
+          //   </button>
+          //   <br />
+          //   <br />
+          // </div>

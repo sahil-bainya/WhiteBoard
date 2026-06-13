@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { clearUser } from "../../store/authSlice.js";
 import { useNavigate } from "react-router-dom";
-
+import { LogOut } from "lucide-react";
 export default function LogoutBtn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,7 +24,12 @@ export default function LogoutBtn() {
 
   return (
     <>
-      <button onClick={logoutHandler} disabled={loading}>
+      <button
+        onClick={logoutHandler}
+        disabled={loading}
+        className="rounded-lg "
+      >
+        <LogOut size={15} />
         {loading ? "Logging out..." : "Logout"}
       </button>
       {error && <p>{error}</p>}

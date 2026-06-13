@@ -178,7 +178,7 @@ const UpdateUserDetails = asyncHandler(async (req, res) => {
         email,
       },
     },
-    { returnDocument: after },
+    { returnDocument: "after" },
   ).select("-password");
 
   return res
@@ -203,7 +203,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         avatar: avatar.url,
       },
     },
-    { returnDocument: after },
+    { returnDocument: "after" },
   ).select("-password");
   await deleteFromCloudinary(oldAvatarUrl);
   return res

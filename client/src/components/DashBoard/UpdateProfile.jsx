@@ -2,13 +2,21 @@ import { useForm } from "react-hook-form";
 import { Input, Button } from "../";
 import { useState } from "react";
 import api from "../../services/api";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../store/authSlice";
 export default function UpdateProfile() {
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -17,8 +25,9 @@ export default function UpdateProfile() {
     setError(null);
     setSuccess(false);
     try {
-      await api.patch("/user/update", data);
+      const updatedUser = await api.patch("/user/update", data);
       setSuccess(true);
+      dispatch(setUser(updatedUser.data.data));
     } catch (err) {
       setError(
         err?.response?.data?.message ||

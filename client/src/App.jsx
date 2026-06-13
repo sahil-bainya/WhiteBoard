@@ -1,5 +1,5 @@
 import "./App.css";
-import { Header } from "./components";
+import { Header, Footer } from "./components";
 import { Outlet, useLocation } from "react-router-dom";
 import api from "./services/api";
 import { setUser, clearUser } from "./store/authSlice.js";
@@ -25,9 +25,12 @@ function App() {
     location.pathname.startsWith("/login") ||
     location.pathname.startsWith("/register");
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       {!hideNavbar && <Header />}
-      <Outlet />
+      <main className="flex-1 pb-10!">
+        <Outlet />
+      </main>
+      {!hideNavbar && <Footer />}
     </div>
   );
 }

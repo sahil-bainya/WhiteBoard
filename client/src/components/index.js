@@ -13,6 +13,7 @@ import Login from "./Auth/Login.jsx";
 import ContextPanel from "./BoardPage/ContextPanel.jsx";
 import AppName from "./AppName.jsx";
 import AuthForm from "./Auth/AuthForm.jsx";
+import Footer from "./Footer.jsx";
 export {
   Input,
   AuthForm,
@@ -29,4 +30,5 @@ export {
   Dashboard,
   Login,
   ContextPanel,
+  Footer
 };

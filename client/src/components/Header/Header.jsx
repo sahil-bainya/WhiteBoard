@@ -2,8 +2,11 @@ import { useSelector } from "react-redux";
 import { UserRound } from "lucide-react";
 import { AppName } from "../";
 import Menubar from "./Menubar.jsx";
+import { useLocation } from "react-router-dom";
 export default function Header() {
   const user = useSelector((state) => state.auth.user);
+  const location = useLocation();
+  const hideSearchBox = location.pathname.startsWith("/settings");
   return (
     <nav>
       <div className="navbar bg-base-100 shadow-sm h-16 px-4!">
@@ -14,6 +17,14 @@ export default function Header() {
         </div>
 
         <div className="flex items-center pr-2!">
+          {!hideSearchBox && (
+            <input
+              type="text"
+              placeholder="Search"
+              className="input input-bordered w-24 md:w-auto px-4! mx-5!"
+            />
+          )}
+
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}
