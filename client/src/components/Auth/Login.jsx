@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
 import "./authStyle.css";
-
+import { notify } from "../../utils/toast.jsx";
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,7 +23,9 @@ export default function Login() {
       setError("");
       const res = await api.post("/user/login", data);
       dispatch(setUser(res.data.data.user));
+      notify.welcome(`Welcome back ${res.data.data.user.name}!`);
       navigate("/dashboard");
+
     } catch (err) {
       setError(err?.response?.data?.message || "Something went wrong");
     } finally {

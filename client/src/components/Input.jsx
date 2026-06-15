@@ -11,11 +11,16 @@ const Input = forwardRef(function Input(
       <input
         {...props}
         type={type}
-        className={`${classname}`}
+        placeholder="Type here"
+        className={`${classname} input w-full px-2!`}
         ref={ref}
         id={id}
-      ></input>
-      {error && <span style={{ color: "red" }}>{error}</span>}
+      />
+      {error && (
+        <div role="alert" className="alert alert-error alert-soft">
+          <span>{error}</span>
+        </div>
+      )}
     </div>
   );
 });

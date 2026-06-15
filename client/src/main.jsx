@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { Provider } from "react-redux";
@@ -11,6 +11,8 @@ import {
 import store from "./store/store.js";
 import { AuthLayout } from "./components";
 import { AuthPage, BoardPage, DashboardPage, SettingsPage } from "./pages";
+import { Toaster } from "react-hot-toast";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -49,9 +51,8 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
-  </StrictMode>,
+  <Provider store={store}>
+    <Toaster position="top-center" />
+    <RouterProvider router={router} />
+  </Provider>,
 );

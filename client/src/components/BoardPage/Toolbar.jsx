@@ -1,7 +1,8 @@
 import { Button } from "../";
 import SaveButton from "./SaveButton";
 import { SHAPE_CONFIG } from "./shapeConfig.jsx";
-import { Workflow, NotebookText } from "lucide-react";
+import { Workflow, NotebookText, Undo2, Redo2 } from "lucide-react";
+import ColorPicker from "./ColorPicker.jsx";
 export default function Toolbar({
   error,
   loading,
@@ -19,6 +20,15 @@ export default function Toolbar({
   saveTitle,
   isEditingTitle,
   setIsEditingTitle,
+  undo,
+  redo,
+  zoomIn,
+  zoomOut,
+  resetZoom,
+  selectedId,
+  shapes,
+  setShapes,
+  saveHistory,
 }) {
   return (
     <div>
@@ -70,6 +80,27 @@ export default function Toolbar({
       >
         <NotebookText />
       </button>
+      <div>
+        <button onClick={() => undo()}>
+          <Undo2 />
+        </button>
+        <button onClick={() => redo()}>
+          <Redo2 />
+        </button>
+      </div>
+      <div>
+        <button onClick={() => zoomIn()}>+</button>
+        <button onClick={() => resetZoom()}>100%</button>
+        <button onClick={() => zoomOut()}>-</button>
+      </div>
+      {selectedId && (
+        <ColorPicker
+          shapes={shapes}
+          selectedId={selectedId}
+          setShapes={setShapes}
+          saveHistory={saveHistory}
+        />
+      )}
     </div>
   );
 }

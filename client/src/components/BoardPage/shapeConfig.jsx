@@ -22,7 +22,7 @@ export const SHAPE_CONFIG = {
   },
   arrow: {
     icon: <MoveUpRight />,
-    defaults: { points: [0, 0, 100, 0], stroke: "#000000", fill: "#000000", strokeWidth: 2 },
+    defaults: { points: [0, 0, 100, 0], stroke: "#000000", fill: "", strokeWidth: 2 },
     Component: Arrow,
     getProps: (el) => ({ points: el.points, strokeWidth: el.strokeWidth }),
   },

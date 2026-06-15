@@ -19,6 +19,56 @@ export function useBoard() {
   const toolbarRef = useRef(null);
   const [connectingFrom, setConnectingFrom] = useState(null);
 
+  const [past, setPast] = useState([]);
+  const [future, setFuture] = useState([]);
+
+  // undo , redo
+
+  const saveHistory = () => {
+    setPast((prev) => [...prev, { shapes, arrows }]);
+    setFuture([]);
+  };
+
+  const undo = () => {
+    if (past.length === 0) return;
+    const previous = past[past.length - 1];
+    setPast((prev) => prev.slice(0, -1));
+    setFuture((prev) => [{ shapes, arrows }, ...prev]);
+    setShapes(previous.shapes);
+    setArrows(previous.arrows);
+  };
+
+  const redo = () => {
+    if (future.length === 0) return;
+    const next = future[0];
+    setFuture((prev) => prev.slice(1));
+    setPast((prev) => [...prev, { shapes, arrows }]);
+    setShapes(next.shapes);
+    setArrows(next.arrows);
+  };
+
+  //Zoom
+  const zoomIn = () => {
+    const stage = stageRef.current;
+    const newScale = Math.min(stage.scaleX() * 1.2, 5);
+    stage.scale({ x: newScale, y: newScale });
+  };
+
+  const zoomOut = () => {
+    const stage = stageRef.current;
+    const newScale = Math.max(stage.scaleX() / 1.2, 0.1);
+    stage.scale({ x: newScale, y: newScale });
+  };
+
+  const resetZoom = () => {
+    const stage = stageRef.current;
+    stage.scale({ x: 1, y: 1 });
+    stage.position({
+      x: stageSize.width / 2,
+      y: stageSize.height / 2,
+    });
+  };
+
   const updateArrowPoints = (movedId) => {
     setArrows((prev) =>
       prev.map((arrow) => {
@@ -47,6 +97,7 @@ export function useBoard() {
   };
 
   const connectShapes = (fromId, toId) => {
+    saveHistory();
     const fromShape = shapes.find((s) => s.id === fromId);
     const toShape = shapes.find((s) => s.id === toId);
     const fromNode = shapeRefs.current[fromId];
@@ -67,6 +118,7 @@ export function useBoard() {
   };
 
   const removeArrowsForShape = (id) => {
+    saveHistory();
     setArrows((prev) => prev.filter((a) => a.from !== id && a.to !== id));
   };
 
@@ -122,6 +174,7 @@ export function useBoard() {
 
     const save = () => {
       if (!document.body.contains(textarea)) return;
+      saveHistory();
       setShapes((prev) =>
         prev.map((s) => (s.id === id ? { ...s, text: textarea.value } : s)),
       );
@@ -140,14 +193,14 @@ export function useBoard() {
   };
 
   const addShape = (type) => {
+    saveHistory();
     setShapes((prev) => [
       ...prev,
       {
         id: crypto.randomUUID(),
         type,
-        x: 100,
-        y: 100,
-
+        x: -50,
+        y: -40,
         ...SHAPE_CONFIG[type].defaults,
         context: {
           notes: "",
@@ -160,6 +213,7 @@ export function useBoard() {
   };
 
   const handleDragEnd = (e, id, updateArrowPoints) => {
+    saveHistory();
     setShapes((prev) =>
       prev.map((s) =>
         s.id === id
@@ -176,12 +230,14 @@ export function useBoard() {
   };
 
   const deleteSelected = (id, removeArrowsForShape) => {
+    saveHistory();
     setShapes((prev) => prev.filter((s) => s.id !== id));
     removeArrowsForShape(id);
     setSelectedId(null);
   };
 
   const handleTransformEnd = (id) => {
+    saveHistory();
     const node = shapeRefs.current[id];
     if (!node) return;
     const shape = shapes.find((s) => s.id === id);
@@ -242,11 +298,12 @@ export function useBoard() {
     setBoardNotes(updatedNotes);
     await api.patch(`/boards/${id}/notes`, { boardNotes: updatedNotes });
   };
-  const removeNotes = async (notesid)=>{
-    const updatedNotes = boardNotes.filter(notes=>notes.id!==notesid)
-     setBoardNotes(updatedNotes);
+
+  const removeNotes = async (notesid) => {
+    const updatedNotes = boardNotes.filter((notes) => notes.id !== notesid);
+    setBoardNotes(updatedNotes);
     await api.patch(`/boards/${id}/notes`, { boardNotes: updatedNotes });
-  }
+  };
 
   useEffect(() => {
     (async () => {
@@ -255,7 +312,7 @@ export function useBoard() {
       setBoardName(res.data.data.board.title);
       setArrows(res.data.data.board.arrows);
       setBoardNotes(res.data.data.board.boardNotes || []);
-      console.log(res.data.data.board.boardNotes)
+      console.log(res.data.data.board.boardNotes);
     })();
   }, [id]);
 
@@ -286,6 +343,12 @@ export function useBoard() {
   }, []);
 
   return {
+    saveHistory,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    undo,
+    redo,
     shapes,
     setShapes,
     boardName,

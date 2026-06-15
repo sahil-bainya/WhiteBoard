@@ -43,6 +43,12 @@ export default function Board() {
     updateArrowPoints,
     connectShapes,
     removeArrowsForShape,
+    undo,
+    redo,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    saveHistory,
   } = useBoard();
 
   const [loading, setLoading] = useState(false);
@@ -51,7 +57,7 @@ export default function Board() {
   const [contextShape, setContextShape] = useState(null);
 
   const [aiResponse, setAiresponse] = useState(null);
-  
+
   const handleAssist = async () => {
     const result = await architectureAssist(shapes, arrows);
     setAiresponse(result);
@@ -107,7 +113,6 @@ export default function Board() {
     setTimeout(() => setPendingCleanup(false), 0);
   }, [pendingCleanup, shapes, updateArrowPoints]);
 
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
@@ -117,8 +122,26 @@ export default function Board() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedId]);
+  }, [selectedId, deleteSelected, removeArrowsForShape]);
 
+  useEffect(() => {
+    const handleKeydown = (e) => {
+      if (e.ctrlKey && e.key === "z") undo();
+      if (e.ctrlKey && e.key === "y") redo();
+    };
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown); //cleanup function hai — React automatically call karta hai jab component unmount ho.
+  }, [undo, redo]);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    stage.position({
+      x: stageSize.width / 2,
+      y: stageSize.height / 2,
+    });
+  }, [stageSize, stageRef]);
   return (
     <div>
       <div ref={toolbarRef}>
@@ -139,6 +162,15 @@ export default function Board() {
           saveTitle={saveTitle}
           isEditingTitle={isEditingTitle}
           setIsEditingTitle={setIsEditingTitle}
+          undo={undo}
+          redo={redo}
+          zoomIn={zoomIn}
+          zoomOut={zoomOut}
+          resetZoom={resetZoom}
+          selectedId={selectedId}
+          shapes={shapes}
+          setShapes={setShapes}
+          saveHistory={saveHistory}
         />
       </div>
 

@@ -10,9 +10,8 @@ import {
   setBoards,
   updateBoard,
 } from "../../store/boardSlice.js";
-
+import { notify } from "../../utils/toast.jsx";
 export default function Dashboard() {
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ export default function Dashboard() {
         const boardResponse = await api.get("/boards");
         dispatch(setBoards(boardResponse.data.data.boards));
       } catch (err) {
-        setError(
+        notify.error(
           err?.response?.data?.message ||
             "Something went wrong while fetching details",
         );
@@ -43,7 +42,7 @@ export default function Dashboard() {
       dispatch(addBoard(res.data.data.board));
       navigate(`/board/${res.data.data.board._id}`);
     } catch (err) {
-      setError(
+      notify.error(
         err?.response?.data?.message ||
           "Something went wrong while creating board",
       );
@@ -55,8 +54,9 @@ export default function Dashboard() {
     try {
       await api.delete(`/boards/${id}`);
       dispatch(removeBoard(id));
+      notify.success("Board deleted!")
     } catch (err) {
-      setError(
+      notify.error(
         err?.response?.data?.message ||
           "Something went wrong while deleting board",
       );
@@ -70,15 +70,14 @@ export default function Dashboard() {
       });
       dispatch(updateBoard({ id, title: editingTitle }));
     } catch (err) {
-      setError(err?.response?.data?.message || "Title update failed");
+      notify.error(err?.response?.data?.message || "Title update failed");
     } finally {
       setEditingBoardId(null);
     }
   };
   if (loading) return <div>Loading...</div>;
   return (
-    <div className="px-4!">
-      {error && <p>{error}</p>}
+    <div className="px-4! py-4!">
       <div className="flex justify-end px-6! py-4! ">
         <button className="btn btn-soft btn-info px-2!" onClick={handleCreate}>
           Create New Board

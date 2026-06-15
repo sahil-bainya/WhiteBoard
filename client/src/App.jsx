@@ -5,7 +5,6 @@ import api from "./services/api";
 import { setUser, clearUser } from "./store/authSlice.js";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-
 function App() {
   const location = useLocation(); // gives the current url
   const dispatch = useDispatch();
@@ -25,9 +24,9 @@ function App() {
     location.pathname.startsWith("/login") ||
     location.pathname.startsWith("/register");
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen">
       {!hideNavbar && <Header />}
-      <main className="flex-1 pb-10!">
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
       {!hideNavbar && <Footer />}
