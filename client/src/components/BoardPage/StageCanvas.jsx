@@ -15,10 +15,11 @@ export default function StageCanvas({
   transformerRef,
   selectedId,
   handleShapeClick,
+  grid
 }) {
   return (
     <Stage
-      id="Canvas"
+      id={grid && "Canvas"}
       width={stageSize.width}
       height={stageSize.height}
       ref={stageRef}

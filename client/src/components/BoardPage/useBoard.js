@@ -1,3 +1,4 @@
+import jsPDF from "jspdf";
 import { useState, useRef, useEffect } from "react";
 import api from "../../services/api.js";
 import { useParams } from "react-router-dom";
@@ -22,6 +23,30 @@ export function useBoard() {
   const [past, setPast] = useState([]);
   const [future, setFuture] = useState([]);
 
+  // export
+  const exportPNG = () => {
+    const stage = stageRef.current;
+    const dataURL = stage.toDataURL({ pixelRatio: 2 }); // high quality
+
+    const link = document.createElement("a");
+    link.download = `${boardName || "board"}.png`;
+    link.href = dataURL;
+    link.click();
+  };
+
+  const exportPDF = () => {
+    const stage = stageRef.current;
+    const dataURL = stage.toDataURL({ pixelRatio: 2 });
+
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [stage.width(), stage.height()],
+    });
+
+    pdf.addImage(dataURL, "PNG", 0, 0, stage.width(), stage.height());
+    pdf.save(`${boardName || "board"}.pdf`);
+  };
   // undo , redo
 
   const saveHistory = () => {
@@ -383,5 +408,7 @@ export function useBoard() {
     removeArrowsForShape,
     getShapeCenter,
     addToNotes,
+    exportPNG,
+    exportPDF,
   };
 }

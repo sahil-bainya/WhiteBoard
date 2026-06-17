@@ -1,8 +1,9 @@
 import { Button } from "../";
 import SaveButton from "./SaveButton";
 import { SHAPE_CONFIG } from "./shapeConfig.jsx";
-import { Workflow, NotebookText, Undo2, Redo2 } from "lucide-react";
+import { Workflow, NotebookText, ImageDown, Download } from "lucide-react";
 import ColorPicker from "./ColorPicker.jsx";
+import TextToDiagram from "./TextToDiagram.jsx";
 export default function Toolbar({
   error,
   loading,
@@ -16,19 +17,18 @@ export default function Toolbar({
   saveBoard,
   setTool,
   arrows,
+  setArrows,
   addShape,
   saveTitle,
   isEditingTitle,
   setIsEditingTitle,
-  undo,
-  redo,
-  zoomIn,
-  zoomOut,
-  resetZoom,
   selectedId,
   shapes,
   setShapes,
   saveHistory,
+  exportPNG,
+  exportPDF,
+  shapeRefs
 }) {
   return (
     <div>
@@ -65,7 +65,9 @@ export default function Toolbar({
         <Workflow />
       </button>
       <SaveButton saveBoard={saveBoard} arrows={arrows} />
-      <Button onClick={handleAssist} children="Assist"></Button>
+      <div className="tooltip" data-tip="Get AI suggestions">
+        <Button onClick={handleAssist} children="Assist"></Button>
+      </div>
       <Button
         onClick={handleCleanup}
         children="cleanup"
@@ -80,18 +82,22 @@ export default function Toolbar({
       >
         <NotebookText />
       </button>
-      <div>
-        <button onClick={() => undo()}>
-          <Undo2 />
+      <div className="dropdown">
+        <button className="btn btn-sm btn-ghost">
+          <ImageDown size={16} /> Export image...
         </button>
-        <button onClick={() => redo()}>
-          <Redo2 />
-        </button>
-      </div>
-      <div>
-        <button onClick={() => zoomIn()}>+</button>
-        <button onClick={() => resetZoom()}>100%</button>
-        <button onClick={() => zoomOut()}>-</button>
+        <ul className="dropdown-content menu bg-base-200 rounded-box w-max p-2!">
+          <li>
+            <button onClick={exportPNG} className="btn btn-s px-2!">
+              <Download /> Export PNG
+            </button>
+          </li>
+          <li>
+            <button onClick={exportPDF} className="btn btn-s px-2!">
+              <Download /> Export PDF
+            </button>
+          </li>
+        </ul>
       </div>
       {selectedId && (
         <ColorPicker
@@ -101,6 +107,14 @@ export default function Toolbar({
           saveHistory={saveHistory}
         />
       )}
+
+      <TextToDiagram
+        saveHistory={saveHistory}
+        setShapes={setShapes}
+        setArrows={setArrows}
+        shapes={shapes}
+        shapeRefs={shapeRefs}
+      />
     </div>
   );
 }

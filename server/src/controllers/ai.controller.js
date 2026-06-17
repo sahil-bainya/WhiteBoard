@@ -154,4 +154,72 @@ Total nodes must be exactly ${shapes.length}.
     .json(new ApiResponse(200, result, "Logical relations indentified"));
 });
 
-export { architectureAssist, messCleanup };
+const textToDiagram = asyncHandler(async (req, res) => {
+  const { description } = req.body;
+  if (!description || description.trim().length === 0) {
+    throw new ApiError(400, "Description is required");
+  }
+  const prompt = `
+You are an expert at converting natural language descriptions into structured diagrams.
+
+USER DESCRIPTION:
+"${description}"
+
+Your task:
+1. Identify all distinct components, entities, or steps mentioned
+2. Identify the relationships or flow between them
+3. Convert this into shapes and arrows that can be rendered on a canvas
+
+RULES:
+- Each component becomes a "rect" shape with appropriate width based on text length (estimate: text length * 9 + 40, minimum 120)
+- Use consistent height of 70 for all rect shapes
+- Arrange shapes in a logical flow — left-to-right for processes, top-to-bottom for hierarchies
+- Space shapes at least 180px apart horizontally and 140px apart vertically
+- Start first shape at x:100, y:100
+- Every relationship mentioned becomes an arrow connecting two shapes by their ids
+- Use sequential numeric strings as ids: "1", "2", "3"...
+- If the description implies a decision or branching (if/else, success/failure), create multiple arrows from one shape
+- Keep shape labels short and clear — max 3-4 words, extracted from the description, not verbatim copied
+- Do not invent components that were not mentioned or clearly implied
+- If the description is ambiguous, make the most reasonable interpretation a software engineer would make
+
+Return ONLY this JSON, nothing else:
+{
+  "shapes": [
+    {
+      "id": "1",
+      "type": "rect",
+      "x": number,
+      "y": number,
+      "width": number,
+      "height": 70,
+      "text": "short label",
+      "fill": "#ffffff",
+      "stroke": "#000000"
+    }
+  ],
+  "arrows": [
+    {
+      "id": "a1",
+      "from": "1",
+      "to": "2"
+    }
+  ]
+}
+`;
+
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: prompt }],
+    response_format: { type: "json_object" },
+  });
+  if (!response) {
+    throw new ApiError(500, "Groq error");
+  }
+  const result = JSON.parse(response.choices[0].message.content);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Diagram generated successfully"));
+});
+
+export { architectureAssist, messCleanup, textToDiagram };

@@ -8,6 +8,7 @@ import AisuggestionPannel from "./AiSuggestionPannel.jsx";
 import NotesPage from "./NotesPage.jsx";
 import Toolbar from "./Toolbar.jsx";
 import StageCanvas from "./StageCanvas.jsx";
+import CanvasControls from "./CanvasControls.jsx";
 
 export default function Board() {
   const {
@@ -49,6 +50,9 @@ export default function Board() {
     zoomOut,
     resetZoom,
     saveHistory,
+    exportPNG,
+    exportPDF,
+    setArrows,
   } = useBoard();
 
   const [loading, setLoading] = useState(false);
@@ -57,11 +61,11 @@ export default function Board() {
   const [contextShape, setContextShape] = useState(null);
 
   const [aiResponse, setAiresponse] = useState(null);
+  const [grid, setGrid] = useState(false);
 
   const handleAssist = async () => {
     const result = await architectureAssist(shapes, arrows);
     setAiresponse(result);
-    console.log(result);
   };
 
   const handleCleanup = async () => {
@@ -92,6 +96,7 @@ export default function Board() {
       setLoading(false);
     }
   };
+
 
   const handleShapeClick = (e, id) => {
     if (tool === "connect") {
@@ -142,6 +147,7 @@ export default function Board() {
       y: stageSize.height / 2,
     });
   }, [stageSize, stageRef]);
+
   return (
     <div>
       <div ref={toolbarRef}>
@@ -171,6 +177,12 @@ export default function Board() {
           shapes={shapes}
           setShapes={setShapes}
           saveHistory={saveHistory}
+          exportPNG={exportPNG}
+          exportPDF={exportPDF}
+          grid={grid}
+          setGrid={setGrid}
+          setArrows={setArrows}
+         shapeRefs={shapeRefs}
         />
       </div>
 
@@ -189,8 +201,17 @@ export default function Board() {
         transformerRef={transformerRef}
         selectedId={selectedId}
         handleShapeClick={handleShapeClick}
+        grid={grid}
       />
-
+      <CanvasControls
+        undo={undo}
+        redo={redo}
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
+        resetZoom={resetZoom}
+        grid={grid}
+        setGrid={setGrid}
+      />
       {contextShape && (
         <div>
           <ContextPanel
