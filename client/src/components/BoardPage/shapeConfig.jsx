@@ -9,25 +9,28 @@ import { Rect, Circle, Text, Arrow, Line } from "react-konva";
 
 export const SHAPE_CONFIG = {
   rect: {
-    icon: <Square />,
+    icon: <Square size={18}/>,
     defaults: { width: 100, height: 80, fill: "", stroke: "#000000" },
     Component: Rect,
+    datatip:"Rectangle",
     getProps: (el) => ({ width: el.width, height: el.height }),
   },
   circle: {
-    icon: <CircleIcon />,
+    icon: <CircleIcon size={18}/>,
     defaults: { radius: 50, fill: "", stroke: "#000000" },
     Component: Circle,
+    datatip:"Circle",
     getProps: (el) => ({ radius: el.radius }),
   },
   text: {
-    icon: <Type />,
+    icon: <Type size={18}/>,
     defaults: { text: "Hello", fontSize: 24, fill: "" },
     Component: Text,
+    datatip:"Text",
     getProps: (el) => ({ text: el.text, fontSize: el.fontSize }),
   },
   arrow: {
-    icon: <MoveUpRight />,
+    icon: <MoveUpRight size={18}/>,
     defaults: {
       points: [0, 0, 100, 0],
       stroke: "#000000",
@@ -35,10 +38,11 @@ export const SHAPE_CONFIG = {
       strokeWidth: 2,
     },
     Component: Arrow,
+    datatip:"Arrow",
     getProps: (el) => ({ points: el.points, strokeWidth: el.strokeWidth }),
   },
   line: {
-    icon: <Minus />,
+    icon: <Minus size={18}/>,
     defaults: {
       points: [0, 0, 100, 0],
       stroke: "#000000",
@@ -47,6 +51,7 @@ export const SHAPE_CONFIG = {
       lineJoin: "round",
     },
     Component: Line,
+    datatip:"Line",
     getProps: (el) => ({ points: el.points, strokeWidth: el.strokeWidth }),
   },
 };

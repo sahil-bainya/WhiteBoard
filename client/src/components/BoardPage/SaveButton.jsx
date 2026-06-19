@@ -16,7 +16,7 @@ export default function SaveButton({ saveBoard, arrows }) {
   };
   return (
     <div>
-      <Button onClick={HandleSave} loading={loading} children="save"></Button>
+      <Button onClick={HandleSave} loading={loading} children="save"  ></Button>
       {error && <p>{error}</p>}
     </div>
   );

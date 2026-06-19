@@ -9,7 +9,7 @@ import NotesPage from "./NotesPage.jsx";
 import Toolbar from "./Toolbar.jsx";
 import StageCanvas from "./StageCanvas.jsx";
 import CanvasControls from "./CanvasControls.jsx";
-
+import ColorPicker from "./ColorPicker.jsx";
 export default function Board() {
   const {
     shapes,
@@ -24,7 +24,6 @@ export default function Board() {
     handleTextDblClick,
     tool,
     setTool,
-    error,
     isEditingTitle,
     setIsEditingTitle,
     stageRef,
@@ -97,7 +96,6 @@ export default function Board() {
     }
   };
 
-
   const handleShapeClick = (e, id) => {
     if (tool === "connect") {
       if (!connectingFrom) {
@@ -152,7 +150,6 @@ export default function Board() {
     <div>
       <div ref={toolbarRef}>
         <Toolbar
-          error={error} // doubt
           loading={loading}
           handleAssist={handleAssist}
           handleCleanup={handleCleanup}
@@ -182,7 +179,7 @@ export default function Board() {
           grid={grid}
           setGrid={setGrid}
           setArrows={setArrows}
-         shapeRefs={shapeRefs}
+          shapeRefs={shapeRefs}
         />
       </div>
 
@@ -203,6 +200,14 @@ export default function Board() {
         handleShapeClick={handleShapeClick}
         grid={grid}
       />
+      {selectedId && (
+        <ColorPicker
+          shapes={shapes}
+          selectedId={selectedId}
+          setShapes={setShapes}
+          saveHistory={saveHistory}
+        />
+      )}
       <CanvasControls
         undo={undo}
         redo={redo}
