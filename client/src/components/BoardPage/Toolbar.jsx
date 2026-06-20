@@ -58,39 +58,52 @@ export default function Toolbar({
       <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1!">
         {Object.entries(SHAPE_CONFIG).map(([type, config]) => (
           <li>
-            <a className="tooltip p-2! tooltip-bottom" data-tip={config.datatip}>
-              <button key={type} onClick={() => addShape(type)}>
+            <div className="tooltip tooltip-bottom" data-tip={config.datatip}>
+              <button
+                key={type}
+                onClick={() => addShape(type)}
+                className="   p-2!"
+              >
                 {config.icon}
               </button>
-            </a>
+            </div>
           </li>
         ))}
         <li>
-          <a className="tooltip p-2!" data-tip="Connect">
+          <div className="tooltip" data-tip="Connect">
             <button
               onClick={() => setTool(tool === "connect" ? "select" : "connect")}
               style={{
                 background: tool === "connect" ? "#000" : "",
                 color: tool === "connect" ? "#fff" : "",
               }}
+              className="p-2!"
             >
               <Workflow size={18} />
             </button>
-          </a>
+          </div>
         </li>
       </ul>
-      <div className="flex flex-row gap-1.5 flex-wrap" >
+      <div className="flex flex-row gap-1.5 flex-wrap">
         <SaveButton saveBoard={saveBoard} arrows={arrows} />
-        <div className="dropdown dropdown-end" >
-          <div tabIndex={0} role="button" className="tooltip tooltip-bottom"  data-tip="use AI features">
-            <button className="btn btn-sm btn-ghost p-5! bg-base-300 rounded-xl"><Brain size={18} />AI</button>
+        <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="tooltip tooltip-bottom"
+            data-tip="use AI features"
+          >
+            <button className="btn btn-sm btn-ghost p-5! bg-base-300 rounded-xl">
+              <Brain size={18} />
+              AI
+            </button>
           </div>
           <ul
             tabIndex="-1"
             className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
           >
             <li className="tooltip" data-tip="Get AI suggestions">
-              <Button onClick={handleAssist} children="Assist" ></Button>
+              <Button onClick={handleAssist} children="Assist"></Button>
             </li>
             <li>
               <Button
@@ -112,17 +125,20 @@ export default function Toolbar({
           </ul>
         </div>
         <div className="tooltip tooltip-bottom" data-tip="Notes">
-        <button
-         className="btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3!"
-          // className={notesShowing ? "bg-amber-400" : ""}
-          onClick={() => {
-            setNotesShowing((prev) => !prev);
-          }}
-        >
-          <NotebookText size={18}/>
-        </button>
+          <button
+            className="btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3!"
+            // className={notesShowing ? "bg-amber-400" : ""}
+            onClick={() => {
+              setNotesShowing((prev) => !prev);
+            }}
+          >
+            <NotebookText size={18} />
+          </button>
         </div>
-         <div className="dropdown dropdown-end tooltip tooltip-bottom" data-tip="Export">
+        <div
+          className="dropdown dropdown-end tooltip tooltip-bottom"
+          data-tip="Export"
+        >
           <button className="btn btn-sm btn-ghost  bg-base-300 rounded-xl py-5! px-3!">
             <ImageDown size={18} />
           </button>
@@ -140,7 +156,6 @@ export default function Toolbar({
           </ul>
         </div>
       </div>
-  
     </div>
   );
 }

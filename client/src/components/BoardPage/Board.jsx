@@ -183,6 +183,14 @@ export default function Board() {
         />
       </div>
 
+      {notesShowing && (
+        <NotesPage
+          boardNotes={boardNotes}
+          onDelete={(id) => removeNotes(id)}
+          addNotes={addToNotes}
+          setNotesShowing={setNotesShowing}
+        />
+      )}
       <StageCanvas
         stageRef={stageRef}
         stageSize={stageSize}
@@ -246,17 +254,11 @@ export default function Board() {
               text: `${aiResponse.summary}\n\n${aiResponse.suggestions
                 .map((s) => `• ${s.title}: ${s.message}`)
                 .join("\n")}`,
+              source: "AI",
+              createdAt: new Date().toISOString(),
             };
             addToNotes(newNote);
           }}
-        />
-      )}
-
-      {notesShowing && (
-        <NotesPage
-          boardNotes={boardNotes}
-          onDelete={(id) => removeNotes(id)}
-          addNotes={addToNotes}
         />
       )}
     </div>
