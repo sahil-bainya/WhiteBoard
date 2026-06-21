@@ -10,6 +10,7 @@ import Toolbar from "./Toolbar.jsx";
 import StageCanvas from "./StageCanvas.jsx";
 import CanvasControls from "./CanvasControls.jsx";
 import ColorPicker from "./ColorPicker.jsx";
+import { notify } from "../../utils/toast.jsx";
 export default function Board() {
   const {
     shapes,
@@ -52,19 +53,40 @@ export default function Board() {
     exportPNG,
     exportPDF,
     setArrows,
+    canvasChangedSinceAI,
+    setCanvasChangedSinceAI,
   } = useBoard();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // for cleanup 
   const [pendingCleanup, setPendingCleanup] = useState(false);
   const [notesShowing, setNotesShowing] = useState(false);
   const [contextShape, setContextShape] = useState(null);
 
   const [aiResponse, setAiresponse] = useState(null);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [aiLoading,setAiLoading] = useState(false);
+
   const [grid, setGrid] = useState(false);
 
   const handleAssist = async () => {
-    const result = await architectureAssist(shapes, arrows);
-    setAiresponse(result);
+    if (!canvasChangedSinceAI && aiResponse) {
+      setAiPanelOpen(true);
+      return;
+    }
+   if(shapes.length===0){
+    notify.error("Canvas is empty")
+    return ;}
+    setAiPanelOpen(true);
+    setAiLoading(true)
+    try {
+      const result = await architectureAssist(shapes, arrows);
+      setAiresponse(result);
+      setCanvasChangedSinceAI(false);
+    } catch (error) {
+      notify.error(error.message);
+    }finally{
+      setAiLoading(false)
+    }
   };
 
   const handleCleanup = async () => {
@@ -147,118 +169,121 @@ export default function Board() {
   }, [stageSize, stageRef]);
 
   return (
-    <div>
-      <div ref={toolbarRef}>
-        <Toolbar
-          loading={loading}
-          handleAssist={handleAssist}
-          handleCleanup={handleCleanup}
-          notesShowing={notesShowing}
-          setNotesShowing={setNotesShowing}
-          boardName={boardName}
-          setBoardName={setBoardName}
-          tool={tool}
-          saveBoard={saveBoard}
-          setTool={setTool}
+    <div className="flex">
+      <div>
+        <div ref={toolbarRef}>
+          <Toolbar
+            loading={loading}
+            handleAssist={handleAssist}
+            handleCleanup={handleCleanup}
+            notesShowing={notesShowing}
+            setNotesShowing={setNotesShowing}
+            boardName={boardName}
+            setBoardName={setBoardName}
+            tool={tool}
+            saveBoard={saveBoard}
+            setTool={setTool}
+            arrows={arrows}
+            addShape={addShape}
+            saveTitle={saveTitle}
+            isEditingTitle={isEditingTitle}
+            setIsEditingTitle={setIsEditingTitle}
+            undo={undo}
+            redo={redo}
+            zoomIn={zoomIn}
+            zoomOut={zoomOut}
+            resetZoom={resetZoom}
+            selectedId={selectedId}
+            shapes={shapes}
+            setShapes={setShapes}
+            saveHistory={saveHistory}
+            exportPNG={exportPNG}
+            exportPDF={exportPDF}
+            grid={grid}
+            setGrid={setGrid}
+            setArrows={setArrows}
+            shapeRefs={shapeRefs}
+            />
+        </div>
+
+        {aiPanelOpen && (
+          <AisuggestionPannel
+            suggestions={aiResponse?.suggestions}
+            summary={aiResponse?.summary}
+            diagramType={aiResponse?.diagram_type}
+            onClose={() => setAiPanelOpen(false)}
+            loading={aiLoading}
+            onAddToNotes={async () => {
+              const newNote = {
+                id: crypto.randomUUID(),
+                text: `${aiResponse?.summary}\n\n${aiResponse?.suggestions
+                  .map((s) => `• ${s.title}: ${s.message}`)
+                  .join("\n")}`,
+                source: "AI",
+                createdAt: new Date().toISOString(),
+              };
+              addToNotes(newNote);
+            }}
+          />
+        )}
+        <StageCanvas
+          stageRef={stageRef}
+          stageSize={stageSize}
+          setSelectedId={setSelectedId}
           arrows={arrows}
-          addShape={addShape}
-          saveTitle={saveTitle}
-          isEditingTitle={isEditingTitle}
-          setIsEditingTitle={setIsEditingTitle}
+          shapes={shapes}
+          shapeRefs={shapeRefs}
+          updateArrowPoints={updateArrowPoints}
+          handleDragEnd={handleDragEnd}
+          handleTransformEnd={handleTransformEnd}
+          handleTextDblClick={handleTextDblClick}
+          setContextShape={setContextShape}
+          transformerRef={transformerRef}
+          selectedId={selectedId}
+          handleShapeClick={handleShapeClick}
+          grid={grid}
+        />
+        {selectedId && (
+          <ColorPicker
+            shapes={shapes}
+            selectedId={selectedId}
+            setShapes={setShapes}
+            saveHistory={saveHistory}
+          />
+        )}
+        <CanvasControls
           undo={undo}
           redo={redo}
           zoomIn={zoomIn}
           zoomOut={zoomOut}
           resetZoom={resetZoom}
-          selectedId={selectedId}
-          shapes={shapes}
-          setShapes={setShapes}
-          saveHistory={saveHistory}
-          exportPNG={exportPNG}
-          exportPDF={exportPDF}
           grid={grid}
           setGrid={setGrid}
-          setArrows={setArrows}
-          shapeRefs={shapeRefs}
         />
-      </div>
+        {contextShape && (
+          <div>
+            <ContextPanel
+              shape={contextShape}
+              onClose={() => setContextShape(null)}
+              onSave={(updatedShape) => {
+                setShapes(
+                  shapes.map((s) =>
+                    s.id === updatedShape.id ? updatedShape : s,
+                  ),
+                );
+                setContextShape(null);
+              }}
+            />
+          </div>
+        )}
 
+      </div>
       {notesShowing && (
         <NotesPage
           boardNotes={boardNotes}
           onDelete={(id) => removeNotes(id)}
           addNotes={addToNotes}
           setNotesShowing={setNotesShowing}
-        />
-      )}
-      <StageCanvas
-        stageRef={stageRef}
-        stageSize={stageSize}
-        setSelectedId={setSelectedId}
-        arrows={arrows}
-        shapes={shapes}
-        shapeRefs={shapeRefs}
-        updateArrowPoints={updateArrowPoints}
-        handleDragEnd={handleDragEnd}
-        handleTransformEnd={handleTransformEnd}
-        handleTextDblClick={handleTextDblClick}
-        setContextShape={setContextShape}
-        transformerRef={transformerRef}
-        selectedId={selectedId}
-        handleShapeClick={handleShapeClick}
-        grid={grid}
-      />
-      {selectedId && (
-        <ColorPicker
-          shapes={shapes}
-          selectedId={selectedId}
-          setShapes={setShapes}
-          saveHistory={saveHistory}
-        />
-      )}
-      <CanvasControls
-        undo={undo}
-        redo={redo}
-        zoomIn={zoomIn}
-        zoomOut={zoomOut}
-        resetZoom={resetZoom}
-        grid={grid}
-        setGrid={setGrid}
-      />
-      {contextShape && (
-        <div>
-          <ContextPanel
-            shape={contextShape}
-            onClose={() => setContextShape(null)}
-            onSave={(updatedShape) => {
-              setShapes(
-                shapes.map((s) =>
-                  s.id === updatedShape.id ? updatedShape : s,
-                ),
-              );
-              setContextShape(null);
-            }}
-          />
-        </div>
-      )}
-
-      {aiResponse && (
-        <AisuggestionPannel
-          suggestions={aiResponse.suggestions}
-          summary={aiResponse.summary}
-          diagramType={aiResponse.diagram_type}
-          onClose={() => setAiresponse(null)}
-          onAddToNotes={async () => {
-            const newNote = {
-              id: crypto.randomUUID(),
-              text: `${aiResponse.summary}\n\n${aiResponse.suggestions
-                .map((s) => `• ${s.title}: ${s.message}`)
-                .join("\n")}`,
-              source: "AI",
-              createdAt: new Date().toISOString(),
-            };
-            addToNotes(newNote);
-          }}
         />
       )}
     </div>

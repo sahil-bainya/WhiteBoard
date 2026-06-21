@@ -151,3 +151,40 @@ card at dashboard
           //   <br />
           //   <br />
           // </div>
+
+
+ // notes section 
+ <div
+          className="card bg-base-200 w-full h-auto shadow-sm  p-2! collapse collapse-arrow"
+          key={notes.id}
+        >
+          <input type="checkbox" />
+        <div className="collapse-title font-semibold">
+          How do I create an account?
+          {notes.source === "AI" && (
+              <div className="badge badge-soft badge-info">AI generated</div>
+            )}
+        </div>
+          <div className="card-body collapse-content">
+            {notes.source === "AI" && (
+              <div className="badge badge-soft badge-info">AI generated</div>
+            )}
+
+            <p style={{ whiteSpace: "pre-wrap" }} className="text-lg">
+              {notes.text}
+            </p>
+
+            <div className="card-actions justify-end items-end">
+              <p className="text-base-content/60 text-xs! flex gap-2">
+                <Calendar size={13} />
+                {formatDate(notes.createdAt)}
+              </p>
+              <button
+                className="btn btn-square btn-sm"
+                onClick={() => onDelete(notes.id)}
+              >
+                <Trash size={14} color="#FF0000" />
+              </button>
+            </div>
+          </div>
+        </div>

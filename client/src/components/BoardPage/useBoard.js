@@ -22,7 +22,7 @@ export function useBoard() {
 
   const [past, setPast] = useState([]);
   const [future, setFuture] = useState([]);
-
+  const [canvasChangedSinceAI, setCanvasChangedSinceAI] = useState(true)
   // export
   const exportPNG = () => {
     const stage = stageRef.current;
@@ -52,6 +52,7 @@ export function useBoard() {
   const saveHistory = () => {
     setPast((prev) => [...prev, { shapes, arrows }]);
     setFuture([]);
+    setCanvasChangedSinceAI(true)
   };
 
   const undo = () => {
@@ -409,6 +410,6 @@ export function useBoard() {
     getShapeCenter,
     addToNotes,
     exportPNG,
-    exportPDF,
+    exportPDF,canvasChangedSinceAI, setCanvasChangedSinceAI
   };
 }

@@ -23,7 +23,7 @@ const architectureAssist = asyncHandler(async (req, res) => {
     })
     .join("\n");
 
-  const prompt = `
+ const prompt = `
 You are an expert diagram analyzer and software architect.
 Analyze the following diagram and first identify what type it is, then provide relevant suggestions.
 
@@ -39,43 +39,45 @@ STEP 1 — Detect diagram type:
 - mind_map → if it shows ideas branching from a center
 - er_diagram → if it shows database entities and relations
 - general → if it does not fit any specific type
+- minimal → ONLY if there is truly nothing to analyze (a single shape with no label, an unconnected line, or empty/meaningless content)
 
-STEP 2 — Based on detected type, provide:
+STEP 2 — Based on detected type, provide relevant suggestions:
 
 If FLOWCHART:
-- Write the algorithm this flowchart represents
-- Find logical errors or missing steps
-- Suggest improvements to the flow
+- Describe the algorithm this flowchart represents, even if it's a short 2-3 step process
+- Point out any logical errors or missing steps
+- Suggest one or two concrete improvements
 
 If ARCHITECTURE:
-- Missing components (load balancer, cache, gateway)
-- Database recommendations
-- Scaling and performance issues
-- Security concerns
+- Missing components relevant to what's already drawn (even a 2-3 component diagram can be missing something important, like an API gateway between a client and database)
+- Database or API recommendations based on the components shown
+- Scaling, performance, or security considerations if relevant to the components present
 
 If ER_DIAGRAM:
-- Missing relationships
-- Normalization issues
-- Index recommendations
+- Missing relationships, normalization issues, index recommendations
 
 If MIND_MAP:
-- Missing branches or concepts
-- Better organization suggestions
+- Missing branches, better organization
 
 If GENERAL:
 - Explain what the diagram represents
-- Find any errors or inconsistencies
-- Suggest improvements
+- Point out any errors or genuinely useful improvements
 
-Rules:
-- Be specific — reference actual component names
-- Maximum 6 suggestions
-- No generic advice
+If MINIMAL (truly empty/meaningless only):
+- Briefly say there isn't enough content to analyze
+- Return an empty or near-empty suggestions array
+
+IMPORTANT — calibrate suggestion depth correctly:
+- A diagram with even 2-3 meaningfully labeled and connected components (e.g. "User" → "App" → "Database") DOES have something worth analyzing. Give 2-4 genuinely useful, specific suggestions for it — don't under-respond just because it's small.
+- Only return few or zero suggestions when the diagram is truly minimal — unlabeled shapes, a stray line, or no real structure at all.
+- Larger, more complex diagrams (5+ components with multiple connections) can have up to 6 suggestions.
+- Every suggestion must reference the actual component names from the diagram — never generic, textbook advice that could apply to any diagram.
+- Do not pad with filler suggestions just to reach a count, but do not artificially shrink the response either. Match the response to what is genuinely useful for this specific diagram.
 
 Return ONLY this JSON, nothing else:
 {
-  "diagram_type": "flowchart|architecture|er_diagram|mind_map|general",
-  "summary": "one line — what this diagram represents",
+  "diagram_type": "flowchart|architecture|er_diagram|mind_map|general|minimal",
+  "summary": "1-2 sentences describing what this diagram represents",
   "suggestions": [
     {
       "type": "error|improvement|missing|algorithm|recommendation",

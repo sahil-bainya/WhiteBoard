@@ -7,9 +7,11 @@ import {
   ImageDown,
   Download,
   Brain,
+  ChevronLeft 
 } from "lucide-react";
 import TextToDiagram from "./TextToDiagram.jsx";
 import "./Toolbar.css";
+import { useNavigate } from "react-router-dom";
 export default function Toolbar({
   loading,
   handleAssist,
@@ -34,9 +36,11 @@ export default function Toolbar({
   exportPDF,
   shapeRefs,
 }) {
+  const navigate = useNavigate()
   return (
     <div className="flex items-center justify-between w-auto m-5!">
-      <div>
+      <div className="flex gap-2">
+        <button onClick={()=>navigate("/dashboard")}><ChevronLeft /></button> 
         {isEditingTitle ? (
           <input
             autoFocus
@@ -124,17 +128,6 @@ export default function Toolbar({
             </li>
           </ul>
         </div>
-        <div className="tooltip tooltip-bottom" data-tip="Notes">
-          <button
-            className="btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3!"
-            // className={notesShowing ? "bg-amber-400" : ""}
-            onClick={() => {
-              setNotesShowing((prev) => !prev);
-            }}
-          >
-            <NotebookText size={18} />
-          </button>
-        </div>
         <div
           className="dropdown dropdown-end tooltip tooltip-bottom"
           data-tip="Export"
@@ -154,6 +147,16 @@ export default function Toolbar({
               </button>
             </li>
           </ul>
+        </div>
+        <div className="tooltip tooltip-bottom" data-tip="Notes">
+          <button
+            className={`btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3! ${notesShowing && "hidden"}`}
+            onClick={() => {
+              setNotesShowing((prev) => !prev);
+            }}
+          >
+            <NotebookText size={18} />
+          </button>
         </div>
       </div>
     </div>
