@@ -11,7 +11,9 @@ import ContextPanel from "./BoardPage/ContextPanel.jsx";
 import AppName from "./AppName.jsx";
 import AuthForm from "./Auth/AuthForm.jsx";
 import Footer from "./Footer.jsx";
+import ToggleTheme from "./ToggleTheme.jsx";
 export {
+  ToggleTheme,
   Input,
   AuthForm,
   AppName,

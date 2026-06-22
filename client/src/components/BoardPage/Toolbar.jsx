@@ -12,6 +12,7 @@ import {
 import TextToDiagram from "./TextToDiagram.jsx";
 import "./Toolbar.css";
 import { useNavigate } from "react-router-dom";
+import {ToggleTheme} from "../";
 export default function Toolbar({
   loading,
   handleAssist,
@@ -58,6 +59,7 @@ export default function Toolbar({
         ) : (
           <h2 onDoubleClick={() => setIsEditingTitle(true)}>{boardName}</h2>
         )}
+        <ToggleTheme/>
       </div>
       <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1!">
         {Object.entries(SHAPE_CONFIG).map(([type, config]) => (

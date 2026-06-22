@@ -3,6 +3,7 @@ import { UserRound } from "lucide-react";
 import { AppName } from "../";
 import Menubar from "./Menubar.jsx";
 import { useLocation } from "react-router-dom";
+import { ToggleTheme } from "../";
 export default function Header() {
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
@@ -15,7 +16,7 @@ export default function Header() {
             <AppName />
           </a>
         </div>
-
+        <ToggleTheme />
         <div className="flex items-center pr-2!">
           {!hideSearchBox && (
             <input

@@ -4,7 +4,14 @@ import api from "../../services/api.js";
 import { useParams } from "react-router-dom";
 import { SHAPE_CONFIG } from "./shapeConfig.jsx";
 import { getShapeCenter, getShapeEdgePoint } from "./canvasHelper.js";
+import { useSelector } from "react-redux";
+
 export function useBoard() {
+  const theme = useSelector((state) => state.theme.mode);
+  console.log(theme);
+  const getDefaultStrokeColor = () =>
+    theme === "dark" ? "#ffffff" : "#000000";
+
   const { id } = useParams();
   const [shapes, setShapes] = useState([]);
   const [arrows, setArrows] = useState([]);
@@ -22,7 +29,27 @@ export function useBoard() {
 
   const [past, setPast] = useState([]);
   const [future, setFuture] = useState([]);
-  const [canvasChangedSinceAI, setCanvasChangedSinceAI] = useState(true)
+  const [canvasChangedSinceAI, setCanvasChangedSinceAI] = useState(true);
+
+  useEffect(() => {
+    const newColor = getDefaultStrokeColor();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShapes((prev) =>
+      prev.map((s) =>
+        s.isDefaultColor
+          ? s.type === "text"
+            ? { ...s, fill: newColor }
+            : { ...s, stroke: newColor }
+          : s,
+      ),
+    );
+    setArrows((prev) =>
+      prev.map((a) =>
+        a.isDefaultColor ? { ...a, stroke: newColor, fill: newColor } : a,
+      ),
+    );
+  }, [theme]);
+
   // export
   const exportPNG = () => {
     const stage = stageRef.current;
@@ -52,7 +79,7 @@ export function useBoard() {
   const saveHistory = () => {
     setPast((prev) => [...prev, { shapes, arrows }]);
     setFuture([]);
-    setCanvasChangedSinceAI(true)
+    setCanvasChangedSinceAI(true);
   };
 
   const undo = () => {
@@ -124,6 +151,7 @@ export function useBoard() {
 
   const connectShapes = (fromId, toId) => {
     saveHistory();
+    const color = getDefaultStrokeColor();
     const fromShape = shapes.find((s) => s.id === fromId);
     const toShape = shapes.find((s) => s.id === toId);
     const fromNode = shapeRefs.current[fromId];
@@ -139,6 +167,9 @@ export function useBoard() {
         from: fromId,
         to: toId,
         points: [from.x, from.y, to.x, to.y],
+        stroke: color, // ← add karo
+        fill: color, // ← arrows mein fill bhi arrowhead ke liye matter karta hai
+        isDefaultColor: true, // ←
       },
     ]);
   };
@@ -220,6 +251,7 @@ export function useBoard() {
 
   const addShape = (type) => {
     saveHistory();
+    const color = getDefaultStrokeColor();
     setShapes((prev) => [
       ...prev,
       {
@@ -228,11 +260,10 @@ export function useBoard() {
         x: -50,
         y: -40,
         ...SHAPE_CONFIG[type].defaults,
-        context: {
-          notes: "",
-          links: [],
-          code: "",
-        },
+        ...(type === "text"
+          ? { fill: color, isDefaultColor: true }
+          : { stroke: color, isDefaultColor: true }),
+        context: { notes: "", links: [], code: "" },
       },
     ]);
     setSelectedId(null);
@@ -410,6 +441,8 @@ export function useBoard() {
     getShapeCenter,
     addToNotes,
     exportPNG,
-    exportPDF,canvasChangedSinceAI, setCanvasChangedSinceAI
+    exportPDF,
+    canvasChangedSinceAI,
+    setCanvasChangedSinceAI,
   };
 }

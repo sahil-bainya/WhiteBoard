@@ -58,12 +58,38 @@ export default function ColorPicker({
     return color;
   };
 
+  const updateText = (value) => {
+    saveHistory();
+     console.log("updating text to:", value)
+    setShapes(
+      shapes.map((s) => (s.id === selectedId ? { ...s, text: value } : s)),
+    );
+  };
+
   const fillOpacity = getOpacity(selectedShape.fill);
   const fillHex = getHex(selectedShape.fill);
   const strokeHex = getHex(selectedShape.stroke);
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
+      {!isText && (
+      <div className="flex items-center gap-1">
+        <span className="text-xs text-base-content/60">Label</span>
+        <input
+          type="text"
+          defaultValue={selectedShape.text || ""}
+          onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      updateText(e.target.value)
+      
+    }
+  }}
+          placeholder="Add label..."
+          className="input input-bordered input-xs w-32"
+        />
+      </div>
+    )}
+
       {isText && (
         <div className="flex items-center gap-1">
           <span className="text-xs text-base-content/60">Color</span>
