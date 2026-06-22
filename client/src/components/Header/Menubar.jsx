@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import LogoutBtn from "./LogoutButton";
 import { useSelector } from "react-redux";
 import { Settings, LayoutDashboard } from "lucide-react";
+import {ToggleTheme} from "../"
 export default function Menubar() {
   const user = useSelector((state) => state.auth.user);
   return (
@@ -19,6 +20,9 @@ export default function Menubar() {
         <Link to="/settings" className="rounded-lg px-4! py-2! ">
           <Settings size={15} /> Settings
         </Link>
+      </li>
+      <li>
+        <ToggleTheme/>
       </li>
       <li className="rounded-lg px-4! py-2! ">
         <LogoutBtn />

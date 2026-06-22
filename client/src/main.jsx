@@ -12,7 +12,8 @@ import store from "./store/store.js";
 import { AuthLayout } from "./components";
 import { AuthPage, BoardPage, DashboardPage, SettingsPage } from "./pages";
 import { Toaster } from "react-hot-toast";
-
+const savedTheme = localStorage.getItem("theme") || "default";
+document.documentElement.setAttribute("data-theme", savedTheme);
 const router = createBrowserRouter([
   {
     path: "/",
