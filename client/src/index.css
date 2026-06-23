@@ -12,3 +12,10 @@ html, body, #root {
   margin: 0;
   padding: 0;
 }
+[data-theme="dark"] {
+  --color-base-100: #141414; 
+  --color-base-200: #0c0c0c;
+  --color-base-300: #141414;
+
+  
+}

@@ -17,7 +17,8 @@ export default function StageCanvas({
   transformerRef,
   selectedId,
   handleShapeClick,
-  grid,
+  grid,setPendingShapeType,
+  pendingShapeType,addShape,
 }) {
   return (
     <Stage
@@ -26,8 +27,23 @@ export default function StageCanvas({
       height={stageSize.height}
       ref={stageRef}
       onMouseDown={(e) => {
-        if (e.target === e.target.getStage()) setSelectedId(null);
-      }}
+    if (pendingShapeType) {
+      // click-position nikalo (Stage ke relative coordinates mein)
+      const pointerPos = e.target.getStage().getPointerPosition();
+      
+      // Stage ka current scale/position consider karo (kyunki zoom/pan ki wajah se 
+      // screen-coordinates aur canvas-coordinates alag ho sakte hain)
+      const stage = e.target.getStage();
+      const transform = stage.getAbsoluteTransform().copy().invert();
+      const canvasPos = transform.point(pointerPos);
+
+      addShape(pendingShapeType, canvasPos.x, canvasPos.y);
+      setPendingShapeType(null); // ek shape place hone ke baad mode reset karo
+      return;
+    }
+
+    if (e.target === e.target.getStage()) setSelectedId(null);
+  }}
     >
       <Layer>
         {arrows.map((arrow) => (

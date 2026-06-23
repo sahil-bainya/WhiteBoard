@@ -7,12 +7,11 @@ import {
   ImageDown,
   Download,
   Brain,
-  ChevronLeft 
+  ChevronLeft,
 } from "lucide-react";
 import TextToDiagram from "./TextToDiagram.jsx";
 import "./Toolbar.css";
 import { useNavigate } from "react-router-dom";
-import {ToggleTheme} from "../";
 export default function Toolbar({
   loading,
   handleAssist,
@@ -26,7 +25,6 @@ export default function Toolbar({
   setTool,
   arrows,
   setArrows,
-  addShape,
   saveTitle,
   isEditingTitle,
   setIsEditingTitle,
@@ -36,12 +34,16 @@ export default function Toolbar({
   exportPNG,
   exportPDF,
   shapeRefs,
+  setPendingShapeType,
+  pendingShapeType,
 }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <div className="flex items-center justify-between w-auto m-5!">
       <div className="flex gap-2">
-        <button onClick={()=>navigate("/dashboard")}><ChevronLeft /></button> 
+        <button onClick={() => navigate("/dashboard")}>
+          <ChevronLeft />
+        </button>
         {isEditingTitle ? (
           <input
             autoFocus
@@ -59,7 +61,6 @@ export default function Toolbar({
         ) : (
           <h2 onDoubleClick={() => setIsEditingTitle(true)}>{boardName}</h2>
         )}
-        <ToggleTheme/>
       </div>
       <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1!">
         {Object.entries(SHAPE_CONFIG).map(([type, config]) => (
@@ -67,8 +68,10 @@ export default function Toolbar({
             <div className="tooltip tooltip-bottom" data-tip={config.datatip}>
               <button
                 key={type}
-                onClick={() => addShape(type)}
-                className="   p-2!"
+                onClick={() => setPendingShapeType(type)}
+                className={
+                  pendingShapeType === type ? "bg-primary p-2! rounded-md text-primary-content" : " p-2!"
+                }
               >
                 {config.icon}
               </button>
@@ -79,11 +82,8 @@ export default function Toolbar({
           <div className="tooltip" data-tip="Connect">
             <button
               onClick={() => setTool(tool === "connect" ? "select" : "connect")}
-              style={{
-                background: tool === "connect" ? "#000" : "",
-                color: tool === "connect" ? "#fff" : "",
-              }}
-              className="p-2!"
+              className={tool === "connect" ? "bg-primary p-2! rounded-md text-primary-content":"p-2!"}
+              
             >
               <Workflow size={18} />
             </button>

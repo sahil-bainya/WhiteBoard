@@ -9,15 +9,7 @@ import {
   Triangle,
 } from "lucide-react";
 
-import {
-  Rect,
-  Circle,
-  Text,
-  Arrow,
-  Line,
-  Ellipse,
-  RegularPolygon,
-} from "react-konva";
+import { Rect, Circle, Text, Arrow, Line, Ellipse } from "react-konva";
 
 export const SHAPE_CONFIG = {
   rect: {
@@ -111,11 +103,16 @@ export const SHAPE_CONFIG = {
   },
   triangle: {
     icon: <Triangle size={18} />,
-    defaults: { sides: 3, radius: 50, fill: "", stroke: "#000000" },
-    Component: RegularPolygon,
+    defaults: {
+      points: [0, -40, 40, 40, -40, 40],
+      fill: "",
+      stroke: "#000000",
+      closed: true,
+      text: "",
+    },
+    Component: Line,
     datatip: "Triangle",
-    text: "",
-    getProps: (el) => ({ sides: el.sides, radius: el.radius }),
+    getProps: (el) => ({ points: el.points, closed: el.closed }),
   },
   parallelogram: {
     icon: <Square size={18} className="-skew-x-12" />,

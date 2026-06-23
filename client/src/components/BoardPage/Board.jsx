@@ -55,16 +55,18 @@ export default function Board() {
     setArrows,
     canvasChangedSinceAI,
     setCanvasChangedSinceAI,
+    pendingShapeType,
+    setPendingShapeType,
   } = useBoard();
 
-  const [loading, setLoading] = useState(false); // for cleanup 
+  const [loading, setLoading] = useState(false); // for cleanup
   const [pendingCleanup, setPendingCleanup] = useState(false);
   const [notesShowing, setNotesShowing] = useState(false);
   const [contextShape, setContextShape] = useState(null);
 
   const [aiResponse, setAiresponse] = useState(null);
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
-  const [aiLoading,setAiLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [grid, setGrid] = useState(false);
 
@@ -73,19 +75,20 @@ export default function Board() {
       setAiPanelOpen(true);
       return;
     }
-   if(shapes.length===0){
-    notify.error("Canvas is empty")
-    return ;}
+    if (shapes.length === 0) {
+      notify.error("Canvas is empty");
+      return;
+    }
     setAiPanelOpen(true);
-    setAiLoading(true)
+    setAiLoading(true);
     try {
       const result = await architectureAssist(shapes, arrows);
       setAiresponse(result);
       setCanvasChangedSinceAI(false);
     } catch (error) {
       notify.error(error.message);
-    }finally{
-      setAiLoading(false)
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -203,7 +206,9 @@ export default function Board() {
             setGrid={setGrid}
             setArrows={setArrows}
             shapeRefs={shapeRefs}
-            />
+            pendingShapeType={pendingShapeType}
+            setPendingShapeType={setPendingShapeType}
+          />
         </div>
 
         {aiPanelOpen && (
@@ -242,6 +247,9 @@ export default function Board() {
           selectedId={selectedId}
           handleShapeClick={handleShapeClick}
           grid={grid}
+          addShape={addShape}
+          pendingShapeType={pendingShapeType}
+            setPendingShapeType={setPendingShapeType}
         />
         {selectedId && (
           <ColorPicker
@@ -276,7 +284,6 @@ export default function Board() {
             />
           </div>
         )}
-
       </div>
       {notesShowing && (
         <NotesPage

@@ -10,7 +10,9 @@ export function useBoard() {
   const theme = useSelector((state) => state.theme.mode);
   console.log(theme);
   const getDefaultStrokeColor = () =>
-    theme === "dark" ? "#ffffff" : "#000000";
+    theme === "dark" || theme === "luxury" || theme === "sunset"
+      ? "#ffffff"
+      : "#000000";
 
   const { id } = useParams();
   const [shapes, setShapes] = useState([]);
@@ -30,6 +32,8 @@ export function useBoard() {
   const [past, setPast] = useState([]);
   const [future, setFuture] = useState([]);
   const [canvasChangedSinceAI, setCanvasChangedSinceAI] = useState(true);
+
+  const [pendingShapeType, setPendingShapeType] = useState(null);
 
   useEffect(() => {
     const newColor = getDefaultStrokeColor();
@@ -249,7 +253,7 @@ export function useBoard() {
     stage.container().addEventListener("mousedown", save, { once: true });
   };
 
-  const addShape = (type) => {
+  const addShape = (type, x = -50, y = -40) => {
     saveHistory();
     const color = getDefaultStrokeColor();
     setShapes((prev) => [
@@ -257,8 +261,8 @@ export function useBoard() {
       {
         id: crypto.randomUUID(),
         type,
-        x: -50,
-        y: -40,
+        x,
+        y,
         ...SHAPE_CONFIG[type].defaults,
         ...(type === "text"
           ? { fill: color, isDefaultColor: true }
@@ -312,12 +316,41 @@ export function useBoard() {
           node.height(h);
           return { width: w, height: h };
         },
+
+        roundedRect: () => {
+          // rect jaisa hi hai, sirf cornerRadius bhi scale karna chahiye (consistency ke liye, optional)
+          const w = Math.max(10, node.width() * scaleX);
+          const h = Math.max(10, node.height() * scaleY);
+          node.width(w);
+          node.height(h);
+          return { width: w, height: h };
+        },
+
         circle: () => {
           const r = Math.max(5, shape.radius * scaleX);
           node.radius(r);
           return { radius: r };
         },
+
+        ellipse: () => {
+          // Ellipse ke alag-alag radiusX, radiusY hote hain — independent scale
+          const rx = Math.max(5, shape.radiusX * scaleX);
+          const ry = Math.max(5, shape.radiusY * scaleY);
+          node.radiusX(rx);
+          node.radiusY(ry);
+          return { radiusX: rx, radiusY: ry };
+        },
+
+        triangle: () => {
+          const newPoints = shape.points.map((p, i) =>
+            i % 2 === 0 ? p * scaleX : p * scaleY,
+          );
+          node.points(newPoints);
+          return { points: newPoints };
+        },
+
         text: () => ({ fontSize: Math.max(8, shape.fontSize * scaleX) }),
+
         arrow: () => {
           const newPoints = shape.points.map((p, i) =>
             i % 2 === 0 ? p * scaleX : p * scaleY,
@@ -325,8 +358,34 @@ export function useBoard() {
           node.points(newPoints);
           return { points: newPoints };
         },
-      }[shape.type]?.() ?? {};
 
+        line: () => {
+          // line same pattern jaisa arrow
+          const newPoints = shape.points.map((p, i) =>
+            i % 2 === 0 ? p * scaleX : p * scaleY,
+          );
+          node.points(newPoints);
+          return { points: newPoints };
+        },
+
+        diamond: () => {
+          // points array hai, isliye arrow/line jaisa hi scale karo
+          const newPoints = shape.points.map((p, i) =>
+            i % 2 === 0 ? p * scaleX : p * scaleY,
+          );
+          node.points(newPoints);
+          return { points: newPoints };
+        },
+
+        parallelogram: () => {
+          // same pattern
+          const newPoints = shape.points.map((p, i) =>
+            i % 2 === 0 ? p * scaleX : p * scaleY,
+          );
+          node.points(newPoints);
+          return { points: newPoints };
+        },
+      }[shape.type]?.() ?? {};
     setShapes((prev) =>
       prev.map((s) =>
         s.id === id
@@ -444,5 +503,7 @@ export function useBoard() {
     exportPDF,
     canvasChangedSinceAI,
     setCanvasChangedSinceAI,
+    pendingShapeType,
+    setPendingShapeType,
   };
 }

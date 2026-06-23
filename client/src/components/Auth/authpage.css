@@ -25,7 +25,7 @@
   top: 0;
   height: 100%;
   width: 50%;
-  transition: all 0.6s ease-in-out;
+  transition: all ;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,20 +43,26 @@
 }
 
 .auth-container.right-panel-active .sign-in-panel {
-  transform: translateX(100%);
+   transform: translateX(100%);
+  visibility: hidden;        /* ✅ yeh add karo */
+  pointer-events: none;
 }
 
 .sign-up-panel {
-  left: 0;
+   left: 0;
   opacity: 0;
   z-index: 1;
+  visibility: hidden;        /* ✅ yeh add karo */
+  pointer-events: none;      /* ✅ yeh bhi */
 }
 
 .auth-container.right-panel-active .sign-up-panel {
-  transform: translateX(100%);
+   transform: translateX(100%);
   opacity: 1;
   z-index: 5;
   animation: authShow 0.6s;
+  visibility: visible;       /* ✅ active hone par visible */
+  pointer-events: auto; 
 }
 
 @keyframes authShow {

@@ -4,8 +4,9 @@ import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
-import "./authStyle.css";
+import "./authStyle.css"; 
 import { notify } from "../../utils/toast.jsx";
+import {Button,Input} from "../"
 export default function SignUp() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -46,9 +47,10 @@ export default function SignUp() {
 
       <div className="auth-input-group">
         <label>Name</label>
-        <input
+        <Input
           type="text"
           placeholder="Your full name"
+          autoComplete="off" 
           {...register("name", { required: "Name is required" })}
         />
         <span className="auth-input-error">{errors.name?.message}</span>
@@ -56,9 +58,10 @@ export default function SignUp() {
 
       <div className="auth-input-group">
         <label>Email</label>
-        <input
+        <Input
           type="email"
           placeholder="you@example.com"
+          autoComplete="off" 
           {...register("email", {
             required: "Email is required",
             validate: {
@@ -72,9 +75,10 @@ export default function SignUp() {
 
       <div className="auth-input-group">
         <label>Password</label>
-        <input
+        <Input
           type="password"
           placeholder="••••••••"
+          autoComplete="new-password" 
           {...register("password", {
             required: "Password is required",
             minLength: {
@@ -88,7 +92,7 @@ export default function SignUp() {
 
       <div className="auth-input-group">
         <label>Avatar <span style={{ color: '#bbb', textTransform: 'none', letterSpacing: 0 }}>(optional)</span></label>
-        <input
+        <Input
           type="file"
           accept="image/*"
           {...register("avatar")}
@@ -98,9 +102,9 @@ export default function SignUp() {
 
       {error && <div className="auth-error-box">{error}</div>}
 
-      <button className="auth-submit-btn" type="submit" disabled={loading}>
+      <Button className="auth-submit-btn" type="submit" loading={loading}>
         {loading ? "Creating account..." : "Sign Up"}
-      </button>
+      </Button>
     </form>
   );
 }

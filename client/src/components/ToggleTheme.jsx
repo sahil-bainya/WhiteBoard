@@ -32,9 +32,9 @@ export default function ToggleTheme() {
             type="radio"
             name="theme-dropdown"
             className="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start p-2! rounded-2xl "
-            aria-label="Default"
-            value="default"
-            defaultChecked={theme === "default"}
+            aria-label="Light"
+            value="light"
+            defaultChecked={theme === "light"}
             onClick={handleToggle}
           />
         </li>
@@ -49,48 +49,40 @@ export default function ToggleTheme() {
             defaultChecked={theme === "default"}
           />
         </li>
-        <li>
-          <input
-            type="radio"
-            name="theme-dropdown"
-            className="theme-controller w-full btn btn-sm btn-block btn-ghost p-2! rounded-2xl justify-start"
-            aria-label="Retro"
-            value="retro"
-            onClick={handleToggle}
-            defaultChecked={theme === "default"}
-          />
-        </li>
+
         <li>
           <input
             type="radio"
             name="theme-dropdown"
             className="theme-controller w-full btn btn-sm p-2! rounded-2xl btn-block btn-ghost justify-start"
-            aria-label="Cyberpunk"
-            value="cyberpunk"
+            aria-label="luxury"
+            value="luxury"
             onClick={handleToggle}
-            defaultChecked={theme === "default"}
+            defaultChecked={theme === "luxury"}
           />
         </li>
+
         <li>
           <input
             type="radio"
             name="theme-dropdown"
             className="theme-controller w-full btn btn-sm p-2! rounded-2xl btn-block btn-ghost justify-start"
-            aria-label="Valentine"
-            value="valentine"
+            aria-label="autumn"
+            value="autumn"
             onClick={handleToggle}
-            defaultChecked={theme === "default"}
+            defaultChecked={theme === "autumn"}
           />
         </li>
+
         <li>
           <input
             type="radio"
             name="theme-dropdown"
             className="theme-controller w-full btn btn-sm p-2! rounded-2xl btn-block btn-ghost justify-start"
-            aria-label="Aqua"
-            value="aqua"
+            aria-label="sunset"
+            value="sunset"
             onClick={handleToggle}
-            defaultChecked={theme === "default"}
+            defaultChecked={theme === "sunset"}
           />
         </li>
       </ul>

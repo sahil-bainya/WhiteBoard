@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../../store/authSlice";
 import "./authStyle.css";
 import { notify } from "../../utils/toast.jsx";
+import {Button,Input} from "../";
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ export default function Login() {
 
       <div className="auth-input-group">
         <label>Email</label>
-        <input
+        <Input
           type="email"
           placeholder="you@example.com"
           {...register("email", {
@@ -56,7 +57,7 @@ export default function Login() {
 
       <div className="auth-input-group">
         <label>Password</label>
-        <input
+        <Input
           type="password"
           placeholder="••••••••"
           {...register("password", {
@@ -74,9 +75,9 @@ export default function Login() {
 
       {error && <div className="auth-error-box">{error}</div>}
 
-      <button className="auth-submit-btn" type="submit" disabled={loading}>
+      <Button className="auth-submit-btn" type="submit" loading={loading}>
         {loading ? "Signing in..." : "Sign In"}
-      </button>
+      </Button>
     </form>
   );
 }
