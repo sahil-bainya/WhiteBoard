@@ -256,10 +256,11 @@ export function useBoard() {
   const addShape = (type, x = -50, y = -40) => {
     saveHistory();
     const color = getDefaultStrokeColor();
+    const id = crypto.randomUUID();
     setShapes((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id,
         type,
         x,
         y,
@@ -270,7 +271,7 @@ export function useBoard() {
         context: { notes: "", links: [], code: "" },
       },
     ]);
-    setSelectedId(null);
+    setSelectedId(id);
   };
 
   const handleDragEnd = (e, id, updateArrowPoints) => {

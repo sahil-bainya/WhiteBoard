@@ -43,7 +43,7 @@
 }
 
 .auth-container.right-panel-active .sign-in-panel {
-   transform: translateX(100%);
+transform: translateX(100%);
   visibility: hidden;        /* ✅ yeh add karo */
   pointer-events: none;
 }

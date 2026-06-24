@@ -11,6 +11,7 @@ import StageCanvas from "./StageCanvas.jsx";
 import CanvasControls from "./CanvasControls.jsx";
 import ColorPicker from "./ColorPicker.jsx";
 import { notify } from "../../utils/toast.jsx";
+
 export default function Board() {
   const {
     shapes,
@@ -172,7 +173,7 @@ export default function Board() {
   }, [stageSize, stageRef]);
 
   return (
-    <div className="flex">
+    <div className="flex"  >
       <div>
         <div ref={toolbarRef}>
           <Toolbar
@@ -231,7 +232,9 @@ export default function Board() {
             }}
           />
         )}
+        <div className={pendingShapeType ? "cursor-crosshair" : "cursor-default"}>
         <StageCanvas
+        
           stageRef={stageRef}
           stageSize={stageSize}
           setSelectedId={setSelectedId}
@@ -249,8 +252,8 @@ export default function Board() {
           grid={grid}
           addShape={addShape}
           pendingShapeType={pendingShapeType}
-            setPendingShapeType={setPendingShapeType}
-        />
+          setPendingShapeType={setPendingShapeType}
+        /></div>
         {selectedId && (
           <ColorPicker
             shapes={shapes}

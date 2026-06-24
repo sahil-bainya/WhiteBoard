@@ -10,7 +10,11 @@ const COLORS = [
   "#ec4899",
   "#14b8a6",
 ];
-
+import { FaGripLines, FaCaretDown } from "react-icons/fa";
+import { Ban, Circle, Type } from "lucide-react";
+import { IoDocumentAttachOutline } from "react-icons/io5";
+// import ContextPanel from "./ContextPanel";
+import "./Toolbar.css";
 export default function ColorPicker({
   shapes,
   selectedId,
@@ -60,7 +64,7 @@ export default function ColorPicker({
 
   const updateText = (value) => {
     saveHistory();
-     console.log("updating text to:", value)
+    console.log("updating text to:", value);
     setShapes(
       shapes.map((s) => (s.id === selectedId ? { ...s, text: value } : s)),
     );
@@ -71,155 +75,397 @@ export default function ColorPicker({
   const strokeHex = getHex(selectedShape.stroke);
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
-      {!isText && (
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-base-content/60">Label</span>
-        <input
-          type="text"
-          defaultValue={selectedShape.text || ""}
-          onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      updateText(e.target.value)
-      
-    }
-  }}
-          placeholder="Add label..."
-          className="input input-bordered input-xs w-32"
-        />
+    <div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <ul className="menu menu-vertical lg:menu-horizontal bg-base-100  p-1.5! border border-primary/40 gap-2 rounded-md">
+          {isText && (
+            <li>
+              <div className="dropdown dropdown-top">
+                <div
+                  className="tooltip p-2! flex justify-center items-center gap-1"
+                  data-tip="Color"
+                  tabIndex={0}
+                >
+                  {fillHex ? <Ban size={18} /> : <Circle color={fillHex} />}
+                  <FaCaretDown size={10} />
+                </div>
+                <ul
+                  tabIndex="-1"
+                  className="dropdown-content  bg-base-100 rounded-md z-1 w-auto p-2! shadow-sm mb-5! border border-primary/40!"
+                >
+                  <li>
+                    <div className="flex items-center gap-1 w-auto flex-wrap">
+                      <span className="text-xs text-base-content/60">Fill</span>
+                      <div className="flex gap-1">
+                        <div className="flex flex-col gap-1">
+                          {[
+                            COLORS.slice(0, Math.ceil(COLORS.length / 2)),
+                            COLORS.slice(Math.ceil(COLORS.length / 2)),
+                          ].map((row, rowIndex) => (
+                            <div key={rowIndex} className="flex gap-1">
+                              {row.map((color) => (
+                                <button
+                                  key={color}
+                                  onClick={() =>
+                                    updateColor(
+                                      "fill",
+                                      hexToRgba(color, fillOpacity),
+                                    )
+                                  }
+                                  style={{ background: color }}
+                                  className={`w-5 h-5 rounded-sm border ${
+                                    fillHex === color
+                                      ? "border-primary border-2"
+                                      : "border-base-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                        <input
+                          id="fill-color-picker"
+                          type="color"
+                          value={fillHex}
+                          onChange={(e) => updateColor("fill", e.target.value)}
+                          className="hidden "
+                        />
+
+                        <label
+                          htmlFor="fill-color-picker"
+                          className="cursor-pointer"
+                        >
+                          <div className="grid grid-cols-2 w-5 h-5 rounded-sm overflow-hidden">
+                            <div className="bg-orange-500" />
+                            <div className="bg-blue-500" />
+                            <div className="bg-green-500" />
+                            <div className="bg-purple-500" />
+                          </div>
+                        </label>
+                      </div>
+
+                      {/* Opacity */}
+                      <span className="text-xs text-base-content/60">
+                        Opacity
+                      </span>
+                      <div className="flex items-center gap-1 ml-1">
+                        <span className="text-xs text-base-content/60">
+                          {Math.round(fillOpacity * 100)}%
+                        </span>
+                        <input
+                          id="rangeopacity"
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={fillOpacity}
+                          onChange={(e) =>
+                            updateColor(
+                              "fill",
+                              hexToRgba(fillHex, parseFloat(e.target.value)),
+                            )
+                          }
+                          className="range range-xs"
+                        />
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          )}
+          {isArrow && (
+            <li>
+              <div className="dropdown dropdown-top">
+                <div
+                  className="tooltip p-2! flex justify-center items-center gap-1"
+                  data-tip="Stroke"
+                  tabIndex={0}
+                >
+                  <FaGripLines size={18} />
+                  <FaCaretDown size={10} />
+                </div>
+                <ul
+                  tabIndex="-1"
+                  className="dropdown-content menu bg-base-100 rounded-md z-1 w-auto p-2! shadow-sm mb-5! border border-primary/40! "
+                >
+                  <li>
+                    <div className="flex items-center gap-1  flex-col">
+                      <span className="text-xs text-base-content/60">
+                        Stroke
+                      </span>
+                      <div className="flex gap-1">
+                        <div className="flex flex-col gap-1">
+                          {[
+                            COLORS.slice(0, Math.ceil(COLORS.length / 2)),
+                            COLORS.slice(Math.ceil(COLORS.length / 2)),
+                          ].map((row, rowIndex) => (
+                            <div key={rowIndex} className="flex gap-1">
+                              {row.map((color) => (
+                                <button
+                                  key={color}
+                                  onClick={() => updateColor("stroke", color)}
+                                  style={{ background: color }}
+                                  className={`w-5 h-5 rounded-sm border ${
+                                    strokeHex === color
+                                      ? "border-primary border-2"
+                                      : "border-base-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+
+                        <input
+                          id="op-color-picker"
+                          type="color"
+                          value={strokeHex}
+                          onChange={(e) =>
+                            updateColor("stroke", e.target.value)
+                          }
+                          className="hidden"
+                        />
+
+                        <label
+                          htmlFor="op-color-picker"
+                          className="cursor-pointer"
+                        >
+                          <div className="grid grid-cols-2 w-5 h-5 rounded-sm overflow-hidden">
+                            <div className="bg-orange-500" />
+                            <div className="bg-blue-500" />
+                            <div className="bg-green-500" />
+                            <div className="bg-purple-500" />
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          )}
+          {!isArrow && !isText && (
+            <li>
+              <div className="dropdown dropdown-top">
+                <div
+                  className="tooltip p-2! flex justify-center items-center gap-1"
+                  data-tip="Color"
+                  tabIndex={0}
+                >
+                  {fillHex ? <Ban size={18} /> : <Circle color={fillHex} />}
+                  <FaCaretDown size={10} />
+                </div>
+                <ul
+                  tabIndex="-1"
+                  className="dropdown-content  bg-base-100 rounded-md z-1 w-auto p-2! shadow-sm mb-5! border border-primary/40!"
+                >
+                  <li>
+                    <div className="flex items-center gap-1 w-auto flex-wrap">
+                      <span className="text-xs text-base-content/60">Fill</span>
+                      <div className="flex gap-1">
+                        <div className="flex flex-col gap-1">
+                          {[
+                            COLORS.slice(0, Math.ceil(COLORS.length / 2)),
+                            COLORS.slice(Math.ceil(COLORS.length / 2)),
+                          ].map((row, rowIndex) => (
+                            <div key={rowIndex} className="flex gap-1">
+                              {row.map((color) => (
+                                <button
+                                  key={color}
+                                  onClick={() =>
+                                    updateColor(
+                                      "fill",
+                                      hexToRgba(color, fillOpacity),
+                                    )
+                                  }
+                                  style={{ background: color }}
+                                  className={`w-5 h-5 rounded-sm border ${
+                                    fillHex === color
+                                      ? "border-primary border-2"
+                                      : "border-base-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                        <input
+                          id="fill-color-picker"
+                          type="color"
+                          value={fillHex}
+                          onChange={(e) => updateColor("fill", e.target.value)}
+                          className="hidden "
+                        />
+
+                        <label
+                          htmlFor="fill-color-picker"
+                          className="cursor-pointer"
+                        >
+                          <div className="grid grid-cols-2 w-5 h-5 rounded-sm overflow-hidden">
+                            <div className="bg-orange-500" />
+                            <div className="bg-blue-500" />
+                            <div className="bg-green-500" />
+                            <div className="bg-purple-500" />
+                          </div>
+                        </label>
+                      </div>
+
+                      {/* Opacity */}
+                      <span className="text-xs text-base-content/60">
+                        Opacity
+                      </span>
+                      <div className="flex items-center gap-1 ml-1">
+                        <span className="text-xs text-base-content/60">
+                          {Math.round(fillOpacity * 100)}%
+                        </span>
+                        <input
+                          id="rangeopacity"
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={fillOpacity}
+                          onChange={(e) =>
+                            updateColor(
+                              "fill",
+                              hexToRgba(fillHex, parseFloat(e.target.value)),
+                            )
+                          }
+                          className="range range-xs"
+                        />
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          )}
+          {!isArrow && !isText && (
+            <li>
+              <div className="dropdown dropdown-top">
+                <div
+                  className="tooltip p-2! flex justify-center items-center gap-1"
+                  data-tip="Stroke"
+                  tabIndex={0}
+                >
+                  <FaGripLines size={18} />
+                  <FaCaretDown size={10} />
+                </div>
+                <ul
+                  tabIndex="-1"
+                  className="dropdown-content menu bg-base-100 rounded-md z-1 w-auto p-2! shadow-sm mb-5! border border-primary/40! "
+                >
+                  <li>
+                    <div className="flex items-center gap-1  flex-col">
+                      <span className="text-xs text-base-content/60">
+                        Stroke
+                      </span>
+                      <div className="flex gap-1">
+                        <div className="flex flex-col gap-1">
+                          {[
+                            COLORS.slice(0, Math.ceil(COLORS.length / 2)),
+                            COLORS.slice(Math.ceil(COLORS.length / 2)),
+                          ].map((row, rowIndex) => (
+                            <div key={rowIndex} className="flex gap-1">
+                              {row.map((color) => (
+                                <button
+                                  key={color}
+                                  onClick={() => updateColor("stroke", color)}
+                                  style={{ background: color }}
+                                  className={`w-5 h-5 rounded-sm border ${
+                                    strokeHex === color
+                                      ? "border-primary border-2"
+                                      : "border-base-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+
+                        <input
+                          id="op-color-picker"
+                          type="color"
+                          value={strokeHex}
+                          onChange={(e) =>
+                            updateColor("stroke", e.target.value)
+                          }
+                          className="hidden"
+                        />
+
+                        <label
+                          htmlFor="op-color-picker"
+                          className="cursor-pointer"
+                        >
+                          <div className="grid grid-cols-2 w-5 h-5 rounded-sm overflow-hidden">
+                            <div className="bg-orange-500" />
+                            <div className="bg-blue-500" />
+                            <div className="bg-green-500" />
+                            <div className="bg-purple-500" />
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          )}
+          {!isText && (
+            <li>
+              <div className="dropdown dropdown-top">
+                <div
+                  className="tooltip p-2! flex justify-center items-center gap-1"
+                  data-tip="Add Label"
+                  tabIndex={0}
+                >
+                  <Type size={18} />
+                  <FaCaretDown size={10} />
+                </div>
+                <ul
+                  tabIndex="-1"
+                  className="dropdown-content menu bg-base-100 rounded-sm z-1 w-auto p-2! shadow-sm mb-5! border border-primary/40"
+                >
+                  <li>
+                    <div className="flex items-center ">
+                      <input
+                        type="text"
+                        defaultValue={selectedShape.text || ""}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            updateText(e.target.value);
+                          }
+                        }}
+                        placeholder="Add label..."
+                        className="input rounded-sm input-sm w-40 p-2! text-md"
+                      />
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          )}
+          <li>
+            <div className="dropdown dropdown-top">
+              <div
+                className="tooltip p-2! flex justify-center items-center gap-1"
+                data-tip="Attach Notes, Code & Links"
+                tabIndex={0}
+              >
+                <IoDocumentAttachOutline size={18} />
+                <FaCaretDown size={10} />
+              </div>
+              <ul
+                tabIndex="-1"
+                className="dropdown-content menu bg-base-100 rounded-box z-1 w-auto p-2! shadow-sm mb-5! border-2"
+              >
+                <li></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </div>
-    )}
-
-      {isText && (
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-base-content/60">Color</span>
-          <div className="flex gap-1">
-            {COLORS.map((color) => (
-              <button
-                key={color}
-                onClick={() => updateColor("fill", color)}
-                style={{ background: color }}
-                className={`w-5 h-5 rounded-md border ${
-                  fillHex === color
-                    ? "border-primary border-2"
-                    : "border-base-300"
-                }`}
-              />
-            ))}
-            <input
-              type="color"
-              value={fillHex}
-              onChange={(e) => updateColor("fill", e.target.value)}
-              className="w-5 h-5 rounded-full cursor-pointer border-0"
-            />
-          </div>
-        </div>
-      )}
-      {isArrow && (
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-base-content/60">Color</span>
-          <div className="flex gap-1">
-            {COLORS.map((color) => (
-              <button
-                key={color}
-                onClick={() => updateColor("stroke", color)}
-                style={{ background: color }}
-                className={`w-5 h-5 rounded-md border ${
-                  fillHex === color
-                    ? "border-primary border-2"
-                    : "border-base-300"
-                }`}
-              />
-            ))}
-            <input
-              type="color"
-              value={fillHex}
-              onChange={(e) => updateColor("fill", e.target.value)}
-              className="w-5 h-5 rounded-full cursor-pointer border-0"
-            />
-          </div>
-        </div>
-      )}
-      {!isArrow && !isText && (
-        <>
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-base-content/60">Fill</span>
-            <div className="flex gap-1">
-              {COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() =>
-                    updateColor("fill", hexToRgba(color, fillOpacity))
-                  }
-                  style={{ background: color }}
-                  className={`w-5 h-5 rounded-md border ${
-                    fillHex === color
-                      ? "border-primary border-2"
-                      : "border-base-300"
-                  }`}
-                />
-              ))}
-              <input
-                type="color"
-                value={fillHex}
-                onChange={(e) =>
-                  updateColor("fill", hexToRgba(e.target.value, fillOpacity))
-                }
-                className="w-5 h-5 rounded-md cursor-pointer border-0"
-              />
-            </div>
-
-            {/* Opacity */}
-            <div className="flex items-center gap-1 ml-1">
-              <span className="text-xs text-base-content/60">
-                {Math.round(fillOpacity * 100)}%
-              </span>
-
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={fillOpacity}
-                onChange={(e) =>
-                  updateColor(
-                    "fill",
-                    hexToRgba(fillHex, parseFloat(e.target.value)),
-                  )
-                }
-                className="range range-xs"
-              />
-            </div>
-          </div>
-
-          <div className="divider divider-horizontal mx-0" />
-
-          {/* Stroke */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-base-content/60">Stroke</span>
-            <div className="flex gap-1">
-              {COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => updateColor("stroke", color)}
-                  style={{ background: color }}
-                  className={`w-5 h-5 rounded-full border ${
-                    strokeHex === color
-                      ? "border-primary border-2"
-                      : "border-base-300"
-                  }`}
-                />
-              ))}
-              <input
-                type="color"
-                value={strokeHex}
-                onChange={(e) => updateColor("stroke", e.target.value)}
-                className="w-5 h-5 rounded-full cursor-pointer border-0"
-              />
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }

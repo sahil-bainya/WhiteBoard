@@ -12,6 +12,7 @@ import {
 import TextToDiagram from "./TextToDiagram.jsx";
 import "./Toolbar.css";
 import { useNavigate } from "react-router-dom";
+import {ToggleTheme} from "../";
 export default function Toolbar({
   loading,
   handleAssist,
@@ -44,6 +45,7 @@ export default function Toolbar({
         <button onClick={() => navigate("/dashboard")}>
           <ChevronLeft />
         </button>
+        
         {isEditingTitle ? (
           <input
             autoFocus
@@ -160,6 +162,7 @@ export default function Toolbar({
             <NotebookText size={18} />
           </button>
         </div>
+        <ToggleTheme/>
       </div>
     </div>
   );

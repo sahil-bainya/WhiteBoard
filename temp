@@ -188,3 +188,154 @@ card at dashboard
             </div>
           </div>
         </div>
+
+
+
+
+
+
+         <li>
+              <div className="dropdown dropdown-top">
+                <div
+                  className="tooltip p-2! flex justify-center items-center gap-1"
+                  data-tip="Color"
+                  tabIndex={0}
+                >
+                  {fillHex ? <Ban size={18} /> : <Circle color={fillHex} />}
+                  <FaCaretDown size={10} />
+                </div>
+                <ul
+                  tabIndex="-1"
+                  className="dropdown-content  bg-base-100 rounded-md z-1 w-auto p-2! shadow-sm mb-5! border border-primary/40!"
+                >
+                  <li>
+                    <div className="flex items-center gap-1 w-auto flex-wrap">
+                      <span className="text-xs text-base-content/60">Fill</span>
+                      <div className="flex gap-1">
+                        <div className="flex flex-col gap-1">
+                          {[
+                            COLORS.slice(0, Math.ceil(COLORS.length / 2)),
+                            COLORS.slice(Math.ceil(COLORS.length / 2)),
+                          ].map((row, rowIndex) => (
+                            <div key={rowIndex} className="flex gap-1">
+                              {row.map((color) => (
+                                <button
+                                  key={color}
+                                  onClick={() =>
+                                    updateColor(
+                                      "fill",
+                                      hexToRgba(color, fillOpacity),
+                                    )
+                                  }
+                                  style={{ background: color }}
+                                  className={`w-5 h-5 rounded-sm border ${
+                                    fillHex === color
+                                      ? "border-primary border-2"
+                                      : "border-base-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                        <input
+                          id="fill-color-picker"
+                          type="color"
+                          value={fillHex}
+                          onChange={(e) => updateColor("fill", e.target.value)}
+                          className="hidden "
+                        />
+
+                        <label
+                          htmlFor="fill-color-picker"
+                          className="cursor-pointer"
+                        >
+                          <div className="grid grid-cols-2 w-5 h-5 rounded-sm overflow-hidden">
+                            <div className="bg-orange-500" />
+                            <div className="bg-blue-500" />
+                            <div className="bg-green-500" />
+                            <div className="bg-purple-500" />
+                          </div>
+                        </label>
+                      </div>
+
+                      {/* Opacity */}
+                        <span className="text-xs text-base-content/60">Opacity</span>
+                      <div className="flex items-center gap-1 ml-1">
+                        <span className="text-xs text-base-content/60">
+                          {Math.round(fillOpacity * 100)}%
+                        </span>
+                        <input
+                          id="rangeopacity"
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={fillOpacity}
+                          onChange={(e) =>
+                            updateColor(
+                              "fill",
+                              hexToRgba(fillHex, parseFloat(e.target.value)),
+                            )
+                          }
+                          className="range range-xs"
+                        />
+                      </div>
+                    </div>
+                  </li>
+                 
+                </ul>
+              </div>
+            </li>
+
+
+
+
+
+            <div>
+        <label htmlFor="Notes">Notes</label>
+        <textarea
+          name="Notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Write the notes here..."
+        />
+      </div>
+      <div>
+        <h3>Links </h3>
+        <hr />
+        {links.map((link) => (
+          <div key={link.id}>
+            {/* target="_blank" <-- so that link will open in new tab
+             rel="noreferrer" <-- so that new tab cannot access previous tab (for security purpose )*/}
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "blue" }}
+            >
+              {link.url}
+            </a>
+            <br />
+            <button onClick={() => removeLink(link.id)}>Delete</button>
+          </div>
+        ))}
+        <input
+          type="text"
+          placeholder="paste link here"
+          value={newLink}
+          onChange={(e) => setNewLink(e.target.value)}
+        />
+        <button onClick={inserLink}>Insert</button>
+      </div>
+      <div>
+        <h3>Code</h3>
+        <label htmlFor="Code"></label>
+        <textarea
+          style={{ fontFamily: "monospace" }}
+          name="Code"
+          value={code}
+          placeholder="Write code here"
+          onChange={(e) => setCode(e.target.value)}
+        />
+      </div>
