@@ -260,6 +260,7 @@ export default function Board() {
             selectedId={selectedId}
             setShapes={setShapes}
             saveHistory={saveHistory}
+            setContextShape={setContextShape}
           />
         )}
         <CanvasControls

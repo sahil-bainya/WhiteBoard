@@ -13,13 +13,13 @@ const COLORS = [
 import { FaGripLines, FaCaretDown } from "react-icons/fa";
 import { Ban, Circle, Type } from "lucide-react";
 import { IoDocumentAttachOutline } from "react-icons/io5";
-// import ContextPanel from "./ContextPanel";
 import "./Toolbar.css";
 export default function ColorPicker({
   shapes,
   selectedId,
   setShapes,
   saveHistory,
+  setContextShape
 }) {
   const selectedShape = shapes.find((s) => s.id === selectedId);
   if (!selectedShape) return null;
@@ -86,7 +86,7 @@ export default function ColorPicker({
                   data-tip="Color"
                   tabIndex={0}
                 >
-                  {fillHex ? <Ban size={18} /> : <Circle color={fillHex} />}
+                  {selectedShape ? <Circle fill ={fillHex} /> : <Ban size={18} />}
                   <FaCaretDown size={10} />
                 </div>
                 <ul
@@ -253,7 +253,7 @@ export default function ColorPicker({
                   data-tip="Color"
                   tabIndex={0}
                 >
-                  {fillHex ? <Ban size={18} /> : <Circle color={fillHex} />}
+                  {selectedShape?.fill ? <Circle fill={fillHex} size={18}/> : <Ban size={18} />}
                   <FaCaretDown size={10} />
                 </div>
                 <ul
@@ -451,17 +451,11 @@ export default function ColorPicker({
               <div
                 className="tooltip p-2! flex justify-center items-center gap-1"
                 data-tip="Attach Notes, Code & Links"
-                tabIndex={0}
+                onClick={()=>setContextShape(selectedShape)}
               >
                 <IoDocumentAttachOutline size={18} />
                 <FaCaretDown size={10} />
-              </div>
-              <ul
-                tabIndex="-1"
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-auto p-2! shadow-sm mb-5! border-2"
-              >
-                <li></li>
-              </ul>
+              </div>  
             </div>
           </li>
         </ul>
