@@ -161,11 +161,38 @@ const textToDiagram = asyncHandler(async (req, res) => {
   if (!description || description.trim().length === 0) {
     throw new ApiError(400, "Description is required");
   }
-  const prompt = `
+ const prompt = `
 You are an expert at converting natural language descriptions into structured diagrams.
 
 USER DESCRIPTION:
 "${description}"
+
+CANVAS GUIDELINES:
+Assume a logical canvas area of approximately 1400 x 900 units.
+Distribute shapes within this area in a way that looks natural and readable — 
+do not place all shapes in a tiny cluster, and do not spread them so far apart 
+that the diagram looks sparse or disconnected. If there are many components 
+(more than 6-7), it is acceptable to use a more compact spacing or wrap into 
+multiple rows, but always stay reasonably close to this logical area.
+
+SHAPE SELECTION (use the most semantically appropriate shape type):
+- "rect" — general process, action, or step (default choice)
+- "roundedRect" — start/end points, or softer process steps
+- "diamond" — decision points, conditionals (if/else, yes/no branches)
+- "ellipse" — entities, actors, or external systems (e.g. "User", "Third-party API")
+- "circle" — small standalone nodes or simple states
+Only use "diamond" when there is a genuine decision/branch in the description.
+Default to "rect" when unsure.
+
+STYLING (use color purposefully, not randomly):
+- fill: use a light, muted color appropriate to the shape's role. Use HEX colors only.
+  Examples: "#e0f2fe" (light blue, for systems/data), "#fef9c3" (light yellow, for decisions), 
+  "#dcfce7" (light green, for start/success), "#fee2e2" (light red, for errors/failure/end), 
+  "#f3f4f6" (light gray, for general/neutral steps)
+- stroke: use a darker shade that complements the fill (e.g. fill "#e0f2fe" pairs with stroke "#0369a1")
+- Do NOT use pure white, pure black, or fully transparent fills unless the step is neutral/default
+- Keep strokeWidth at exactly 2 for all shapes — do not vary this
+- Never set opacity below 0.85 — text must remain clearly readable against the fill
 
 Your task:
 1. Identify all distinct components, entities, or steps mentioned
@@ -173,18 +200,30 @@ Your task:
 3. Convert this into shapes and arrows that can be rendered on a canvas
 
 RULES:
-- Each component becomes a "rect" shape with appropriate width based on text length (estimate: text length * 9 + 40, minimum 120)
-- Use consistent height of 70 for all rect shapes
+- CRITICAL: All numeric values (x, y, width, height) MUST be final, pre-calculated numbers only. 
+  NEVER write mathematical expressions like "100 + 180" in the JSON. 
+  Always compute the result yourself before writing it (e.g. write "280", not "100 + 180").
+- Each shape's width should be based on text length (estimate: text length * 9 + 40, minimum 120, maximum 280)
+- Use consistent height of 70 for rect/roundedRect shapes; for diamond/ellipse/circle, 
+  use a radius or equivalent sizing of roughly 50-70 so the label fits comfortably
 - Arrange shapes in a logical flow — left-to-right for processes, top-to-bottom for hierarchies
 - Space shapes at least 180px apart horizontally and 140px apart vertically
-- Start first shape at x:100, y:100
+- Start first shape at x:100, y:100, and keep the overall diagram within the 1400 x 900 logical area
 - Every relationship mentioned becomes an arrow connecting two shapes by their ids
 - Use sequential numeric strings as ids: "1", "2", "3"...
-- If the description implies a decision or branching (if/else, success/failure), create multiple arrows from one shape
+- If the description implies a decision or branching (if/else, success/failure), 
+  create multiple arrows from the diamond shape representing that decision
 - Keep shape labels short and clear — max 3-4 words, extracted from the description, not verbatim copied
 - Do not invent components that were not mentioned or clearly implied
 - If the description is ambiguous, make the most reasonable interpretation a software engineer would make
 
+SHAPE-SPECIFIC JSON FORMATS:
+- For "rect", "roundedRect": use "x", "y", "width", "height"
+- For "circle": use "x", "y", "radius" (no width/height)
+- For "ellipse": use "x", "y", "radiusX", "radiusY"
+- For "diamond": use "x", "y", and "points" as an array of 8 numbers representing 
+  4 relative vertices, e.g. "points": [0, -40, 40, 0, 0, 40, -40, 0]
+Do not mix formats — only include the properties relevant to the chosen shape type.
 Return ONLY this JSON, nothing else:
 {
   "shapes": [
@@ -196,8 +235,8 @@ Return ONLY this JSON, nothing else:
       "width": number,
       "height": 70,
       "text": "short label",
-      "fill": "#ffffff",
-      "stroke": "#000000"
+      "fill": "#hexcolor",
+      "stroke": "#hexcolor"
     }
   ],
   "arrows": [

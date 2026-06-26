@@ -1,7 +1,7 @@
-import { Stage, Layer, Transformer, Arrow ,Text} from "react-konva";
+import { Stage, Layer, Transformer, Arrow, Text } from "react-konva";
 import { SHAPE_CONFIG } from "./shapeConfig.jsx";
 import { getTextPosition } from "./canvasHelper.js";
-
+import "./BoardStyle.css";
 export default function StageCanvas({
   stageRef,
   stageSize,
@@ -17,33 +17,48 @@ export default function StageCanvas({
   transformerRef,
   selectedId,
   handleShapeClick,
-  grid,setPendingShapeType,
-  pendingShapeType,addShape,
+  grid,
+  setPendingShapeType,
+  pendingShapeType,
+  addShape,
 }) {
   return (
     <Stage
-      id={grid && "Canvas"}
+      id={grid ? "Canvas" : undefined}
       width={stageSize.width}
       height={stageSize.height}
       ref={stageRef}
+      draggable
+  //     onWheel={(e) => {  // ← yeh add karo, ZOOM ke liye
+  //   e.evt.preventDefault();
+  //   const stage = stageRef.current;
+  //   const oldScale = stage.scaleX();
+  //   const pointer = stage.getPointerPosition();
+  //   const scaleBy = 1.1;
+  //   const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+  //   const clampedScale = Math.min(Math.max(newScale, 0.1), 5);
+  //   stage.scale({ x: clampedScale, y: clampedScale });
+  //   const newPos = {
+  //     x: pointer.x - (pointer.x - stage.x()) * (clampedScale / oldScale),
+  //     y: pointer.y - (pointer.y - stage.y()) * (clampedScale / oldScale),
+  //   };
+  //   stage.position(newPos);
+  // }}
       onMouseDown={(e) => {
-    if (pendingShapeType) {
-      // click-position nikalo (Stage ke relative coordinates mein)
-      const pointerPos = e.target.getStage().getPointerPosition();
-      
-      // Stage ka current scale/position consider karo (kyunki zoom/pan ki wajah se 
-      // screen-coordinates aur canvas-coordinates alag ho sakte hain)
-      const stage = e.target.getStage();
-      const transform = stage.getAbsoluteTransform().copy().invert();
-      const canvasPos = transform.point(pointerPos);
+        if (pendingShapeType) {
+          const pointerPos = e.target.getStage().getPointerPosition();
 
-      addShape(pendingShapeType, canvasPos.x, canvasPos.y);
-      setPendingShapeType(null); // ek shape place hone ke baad mode reset karo
-      return;
-    }
+          const stage = e.target.getStage();
+          const transform = stage.getAbsoluteTransform().copy().invert();
+          const canvasPos = transform.point(pointerPos);
 
-    if (e.target === e.target.getStage()) setSelectedId(null);
-  }}
+          addShape(pendingShapeType, canvasPos.x, canvasPos.y);
+          setPendingShapeType(null);
+          return;
+        }
+
+        if (e.target === e.target.getStage()) setSelectedId(null);
+      }}
     >
       <Layer>
         {arrows.map((arrow) => (
@@ -57,6 +72,10 @@ export default function StageCanvas({
         ))}
         {shapes.map((el) => {
           const { Component, getProps } = SHAPE_CONFIG[el.type];
+           if (el.type === "diamond") {
+    console.log("Diamond props:", getProps(el));
+    console.log("Diamond el:", el);
+  }
           return (
             <>
               <Component
@@ -80,15 +99,14 @@ export default function StageCanvas({
                 {...getProps(el)}
               />
 
-              {/* naya — label text, sirf non-text shapes ke liye jinke paas text hai */}
               {el.type !== "text" && el.text && (
                 <Text
                   key={el.id + "-label"}
                   {...getTextPosition(el)}
                   text={el.text}
                   align="center"
-                  fill={el.stroke || "#000000"} 
-                  listening={false} // ← important, taaki click events Component pe hi jaayein, text overlap na kare
+                  fill={el.stroke || "#000000"}
+                  listening={false}
                   rotation={el.rotation || 0}
                 />
               )}

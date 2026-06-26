@@ -71,18 +71,28 @@ export const SHAPE_CONFIG = {
     getProps: (el) => ({ radiusX: el.radiusX, radiusY: el.radiusY }),
   },
   diamond: {
-    icon: <DiamondIcon size={18} />,
-    defaults: {
-      points: [0, -40, 40, 0, 0, 40, -40, 0],
-      fill: "",
-      stroke: "#000000",
-      text: "",
-      closed: true,
-    },
-    Component: Line,
-    datatip: "Diamond",
-    getProps: (el) => ({ points: el.points, closed: el.closed }),
+  icon: <DiamondIcon size={18} />,
+  defaults: {
+    points: [0, -40, 40, 0, 0, 40, -40, 0, 0, -40],
+    fill: "",    
+    stroke: "#000000",
+    
+    strokeWidth: 2,
+    text: "",
+    closed: true,
   },
+  Component: Line,
+  datatip: "Diamond",
+  getProps: (el) => ({
+    x: el.x,
+    y: el.y,
+    points: el.points,
+    closed: el.closed,
+    fill: el.fill,
+    stroke: el.stroke,
+    strokeWidth: el.strokeWidth || 2,
+  }),
+},
   roundedRect: {
     icon: <Square size={18} className="rounded-md" />,
     defaults: {

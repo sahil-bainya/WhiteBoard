@@ -5,6 +5,34 @@ import { notify } from "../../utils/toast.jsx";
 import { useEffect } from "react";
 import { getShapeCenter, getShapeEdgePoint } from "./canvasHelper.js";
 
+const sanitizeShape = (shape) => {
+  const isValidHex = (color) =>
+    typeof color === "string" && /^#[0-9A-F]{6}$/i.test(color);
+
+  let sanitized = {
+    ...shape,
+    fill: isValidHex(shape.fill) ? shape.fill : "#f3f4f6",
+    stroke: isValidHex(shape.stroke) ? shape.stroke : "#374151",
+    context: shape.context || { notes: [], links: [], code: "" },
+  };
+
+  if (
+    ["diamond", "parallelogram", "triangle", "line", "arrow"].includes(
+      shape.type,
+    )
+  ) {
+    if (!Array.isArray(shape.points) || shape.points.length === 0) {
+      const w = (shape.width || 120) / 2;
+      const h = (shape.height || 80) / 2;
+
+      sanitized.points = [0, -h, w, 0, 0, h, -w, 0, 0, -h];
+    }
+    sanitized.closed = true;
+  }
+
+  return sanitized;
+};
+
 export default function TextToDiagram({
   saveHistory,
   setShapes,
@@ -25,8 +53,10 @@ export default function TextToDiagram({
     try {
       const response = await textTodiagram(description);
       saveHistory();
-      const newShapes = response.shapes;
+
+      const newShapes = response.shapes.map(sanitizeShape);
       const newArrows = response.arrows;
+
       setShapes((prev) => [...prev, ...newShapes]);
       setArrows((prev) => [...prev, ...newArrows]);
       setNewlyGeneratedShapes(Date.now());
@@ -67,9 +97,7 @@ export default function TextToDiagram({
         return { ...arrow, points: [from.x, from.y, to.x, to.y] };
       }),
     );
-
-
-  }, [newlyGeneratedShapes, setArrows,shapeRefs,shapes]);
+  }, [newlyGeneratedShapes, setArrows, shapeRefs, shapes]);
 
   return (
     <div>
