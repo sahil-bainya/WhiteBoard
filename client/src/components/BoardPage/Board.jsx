@@ -9,7 +9,7 @@ import NotesPage from "./NotesPage.jsx";
 import Toolbar from "./Toolbar.jsx";
 import StageCanvas from "./StageCanvas.jsx";
 import CanvasControls from "./CanvasControls.jsx";
-import ColorPicker from "./ColorPicker.jsx";
+import SelectionControls from "./SelectionControls..jsx";
 import { notify } from "../../utils/toast.jsx";
 
 export default function Board() {
@@ -173,45 +173,74 @@ export default function Board() {
   }, [stageSize, stageRef]);
 
   return (
-    <div className="flex"  >
-      <div>
-        <div ref={toolbarRef}>
-          <Toolbar
-            loading={loading}
-            handleAssist={handleAssist}
-            handleCleanup={handleCleanup}
-            notesShowing={notesShowing}
-            setNotesShowing={setNotesShowing}
-            boardName={boardName}
-            setBoardName={setBoardName}
-            tool={tool}
-            saveBoard={saveBoard}
-            setTool={setTool}
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      {/* TOP BAR — canvas ke upar, apni height occupy kare */}
+      <div ref={toolbarRef} className="flex-shrink-0 z-50">
+        <Toolbar
+          loading={loading}
+          handleAssist={handleAssist}
+          handleCleanup={handleCleanup}
+          notesShowing={notesShowing}
+          setNotesShowing={setNotesShowing}
+          boardName={boardName}
+          setBoardName={setBoardName}
+          tool={tool}
+          saveBoard={saveBoard}
+          setTool={setTool}
+          arrows={arrows}
+          addShape={addShape}
+          saveTitle={saveTitle}
+          isEditingTitle={isEditingTitle}
+          setIsEditingTitle={setIsEditingTitle}
+          undo={undo}
+          redo={redo}
+          zoomIn={zoomIn}
+          zoomOut={zoomOut}
+          resetZoom={resetZoom}
+          selectedId={selectedId}
+          shapes={shapes}
+          setShapes={setShapes}
+          saveHistory={saveHistory}
+          exportPNG={exportPNG}
+          exportPDF={exportPDF}
+          grid={grid}
+          setGrid={setGrid}
+          setArrows={setArrows}
+          shapeRefs={shapeRefs}
+          pendingShapeType={pendingShapeType}
+          setPendingShapeType={setPendingShapeType}
+        />
+      </div>
+
+      {/* CANVAS AREA — baaki poori height */}
+      <div className="relative flex-1 overflow-hidden">
+        {/* Konva Canvas */}
+        <div
+          className={pendingShapeType ? "cursor-crosshair" : "cursor-default"}
+        >
+          <StageCanvas
+            stageRef={stageRef}
+            stageSize={stageSize}
+            setSelectedId={setSelectedId}
             arrows={arrows}
-            addShape={addShape}
-            saveTitle={saveTitle}
-            isEditingTitle={isEditingTitle}
-            setIsEditingTitle={setIsEditingTitle}
-            undo={undo}
-            redo={redo}
-            zoomIn={zoomIn}
-            zoomOut={zoomOut}
-            resetZoom={resetZoom}
-            selectedId={selectedId}
             shapes={shapes}
-            setShapes={setShapes}
-            saveHistory={saveHistory}
-            exportPNG={exportPNG}
-            exportPDF={exportPDF}
-            grid={grid}
-            setGrid={setGrid}
-            setArrows={setArrows}
             shapeRefs={shapeRefs}
+            updateArrowPoints={updateArrowPoints}
+            handleDragEnd={handleDragEnd}
+            handleTransformEnd={handleTransformEnd}
+            handleTextDblClick={handleTextDblClick}
+            setContextShape={setContextShape}
+            transformerRef={transformerRef}
+            selectedId={selectedId}
+            handleShapeClick={handleShapeClick}
+            grid={grid}
+            addShape={addShape}
             pendingShapeType={pendingShapeType}
             setPendingShapeType={setPendingShapeType}
           />
         </div>
 
+        {/* AI Suggestion Panel — mid left, canvas ke andar */}
         {aiPanelOpen && (
           <AisuggestionPannel
             suggestions={aiResponse?.suggestions}
@@ -232,48 +261,10 @@ export default function Board() {
             }}
           />
         )}
-        <div className={pendingShapeType ? "cursor-crosshair" : "cursor-default"}>
-        <StageCanvas
-        
-          stageRef={stageRef}
-          stageSize={stageSize}
-          setSelectedId={setSelectedId}
-          arrows={arrows}
-          shapes={shapes}
-          shapeRefs={shapeRefs}
-          updateArrowPoints={updateArrowPoints}
-          handleDragEnd={handleDragEnd}
-          handleTransformEnd={handleTransformEnd}
-          handleTextDblClick={handleTextDblClick}
-          setContextShape={setContextShape}
-          transformerRef={transformerRef}
-          selectedId={selectedId}
-          handleShapeClick={handleShapeClick}
-          grid={grid}
-          addShape={addShape}
-          pendingShapeType={pendingShapeType}
-          setPendingShapeType={setPendingShapeType}
-        /></div>
-        {selectedId && (
-          <ColorPicker
-            shapes={shapes}
-            selectedId={selectedId}
-            setShapes={setShapes}
-            saveHistory={saveHistory}
-            setContextShape={setContextShape}
-          />
-        )}
-        <CanvasControls
-          undo={undo}
-          redo={redo}
-          zoomIn={zoomIn}
-          zoomOut={zoomOut}
-          resetZoom={resetZoom}
-          grid={grid}
-          setGrid={setGrid}
-        />
+
+        {/* ContextPanel — bottom center, SelectionControls ke upar */}
         {contextShape && (
-          <div>
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 w-[35vw] max-w-xl">
             <ContextPanel
               shape={contextShape}
               onClose={() => setContextShape(null)}
@@ -288,14 +279,48 @@ export default function Board() {
             />
           </div>
         )}
+
+        {/* SelectionControls — bottom center */}
+        {selectedId && (
+          <div
+            className={`absolute bottom-4 left-1/2 -translate-x-1/2 z-40 transition-opacity duration-200 ${
+              contextShape ? "opacity-40 pointer-events-none" : "opacity-100"
+            }`}
+          >
+            <SelectionControls
+              shapes={shapes}
+              selectedId={selectedId}
+              setShapes={setShapes}
+              saveHistory={saveHistory}
+              setContextShape={setContextShape}
+            />
+          </div>
+        )}
+
+        {/* CanvasControls — bottom left */}
+        <div className="absolute bottom-4 left-4 z-40">
+          <CanvasControls
+            undo={undo}
+            redo={redo}
+            zoomIn={zoomIn}
+            zoomOut={zoomOut}
+            resetZoom={resetZoom}
+            grid={grid}
+            setGrid={setGrid}
+          />
+        </div>
       </div>
+
+      {/* Notes Page — right side slide-in */}
       {notesShowing && (
-        <NotesPage
-          boardNotes={boardNotes}
-          onDelete={(id) => removeNotes(id)}
-          addNotes={addToNotes}
-          setNotesShowing={setNotesShowing}
-        />
+        <div className="absolute right-0 top-0 h-full z-50 shadow-xl border-l border-base-300 w-[clamp(260px,25vw,380px)] overflow-hidden">
+          <NotesPage
+            boardNotes={boardNotes}
+            onDelete={(id) => removeNotes(id)}
+            addNotes={addToNotes}
+            setNotesShowing={setNotesShowing}
+          />
+        </div>
       )}
     </div>
   );

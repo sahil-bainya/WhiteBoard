@@ -177,7 +177,7 @@ export const getTextPosition = (shape) => {
       x: shape.x + minX,
       y: shape.y + (minY + maxY) / 2 - 7,
       width: w,
-      fontSize: Math.max(10, w * 0.1),
+      fontSize: Math.max(10, w * 0.08),
     };
   }
 

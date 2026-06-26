@@ -51,7 +51,7 @@ export default function NotesPage({
 
   return (
     
-    <div className="w-full sm:w-80 md:w-96 lg:w-md flex flex-col gap-3 p-4! bg-base-100 h-screen">
+    <div className="w-full flex flex-col gap-3 p-4! bg-base-100 h-screen">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Notes</h2>

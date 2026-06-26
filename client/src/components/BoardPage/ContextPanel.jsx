@@ -24,7 +24,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
   };
   return (
     <div>
-      <div className="tabs tabs-box w-100 gap-3 p-3! bg-base-300 border border-primary/50">
+      <div className="tabs tabs-box w-full gap-3 p-3! bg-base-300 border border-primary/50">
         <input
           type="radio"
           name="my_tabs_6"

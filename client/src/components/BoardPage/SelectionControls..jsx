@@ -14,7 +14,7 @@ import { FaGripLines, FaCaretDown } from "react-icons/fa";
 import { Ban, Circle, Type } from "lucide-react";
 import { IoDocumentAttachOutline } from "react-icons/io5";
 import "./Toolbar.css";
-export default function ColorPicker({
+export default function SelectionControls({
   shapes,
   selectedId,
   setShapes,

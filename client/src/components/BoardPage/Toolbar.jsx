@@ -40,7 +40,7 @@ export default function Toolbar({
 }) {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-between w-auto m-5!">
+    <div className="flex items-center justify-between w-auto m-5! ">
       <div className="flex gap-2">
         <button onClick={() => navigate("/dashboard")}>
           <ChevronLeft />
@@ -51,6 +51,7 @@ export default function Toolbar({
             autoFocus
             value={boardName}
             onChange={(e) => setBoardName(e.target.value)}
+            className="text-xl font-semibold"
             onBlur={saveTitle}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -61,10 +62,10 @@ export default function Toolbar({
             }}
           />
         ) : (
-          <h2 onDoubleClick={() => setIsEditingTitle(true)}>{boardName}</h2>
+          <h2 className="text-xl font-semibold" onDoubleClick={() => setIsEditingTitle(true)}>{boardName}</h2>
         )}
       </div>
-      <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1!">
+      <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1! border border-primary/40" >
         {Object.entries(SHAPE_CONFIG).map(([type, config]) => (
           <li>
             <div className="tooltip tooltip-bottom" data-tip={config.datatip}>
