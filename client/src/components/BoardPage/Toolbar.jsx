@@ -1,5 +1,4 @@
 import { Button } from "../";
-import SaveButton from "./SaveButton";
 import { SHAPE_CONFIG } from "./shapeConfig.jsx";
 import {
   Workflow,
@@ -12,7 +11,7 @@ import {
 import TextToDiagram from "./TextToDiagram.jsx";
 import "./Toolbar.css";
 import { useNavigate } from "react-router-dom";
-import {ToggleTheme} from "../";
+import { ToggleTheme } from "../";
 export default function Toolbar({
   loading,
   handleAssist,
@@ -22,9 +21,7 @@ export default function Toolbar({
   boardName,
   setBoardName,
   tool,
-  saveBoard,
   setTool,
-  arrows,
   setArrows,
   saveTitle,
   isEditingTitle,
@@ -37,6 +34,8 @@ export default function Toolbar({
   shapeRefs,
   setPendingShapeType,
   pendingShapeType,
+  stageRef,
+  stageSize,
 }) {
   const navigate = useNavigate();
   return (
@@ -45,7 +44,7 @@ export default function Toolbar({
         <button onClick={() => navigate("/dashboard")}>
           <ChevronLeft />
         </button>
-        
+
         {isEditingTitle ? (
           <input
             autoFocus
@@ -62,10 +61,15 @@ export default function Toolbar({
             }}
           />
         ) : (
-          <h2 className="text-xl font-semibold" onDoubleClick={() => setIsEditingTitle(true)}>{boardName}</h2>
+          <h2
+            className="text-xl font-semibold"
+            onDoubleClick={() => setIsEditingTitle(true)}
+          >
+            {boardName}
+          </h2>
         )}
       </div>
-      <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1! border border-primary/40" >
+      <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1! border border-primary/40">
         {Object.entries(SHAPE_CONFIG).map(([type, config]) => (
           <li>
             <div className="tooltip tooltip-bottom" data-tip={config.datatip}>
@@ -73,7 +77,9 @@ export default function Toolbar({
                 key={type}
                 onClick={() => setPendingShapeType(type)}
                 className={
-                  pendingShapeType === type ? "bg-primary p-2! rounded-md text-primary-content" : " p-2!"
+                  pendingShapeType === type
+                    ? "bg-primary p-2! rounded-md text-primary-content"
+                    : " p-2!"
                 }
               >
                 {config.icon}
@@ -85,8 +91,11 @@ export default function Toolbar({
           <div className="tooltip" data-tip="Connect">
             <button
               onClick={() => setTool(tool === "connect" ? "select" : "connect")}
-              className={tool === "connect" ? "bg-primary p-2! rounded-md text-primary-content":"p-2!"}
-              
+              className={
+                tool === "connect"
+                  ? "bg-primary p-2! rounded-md text-primary-content"
+                  : "p-2!"
+              }
             >
               <Workflow size={18} />
             </button>
@@ -94,7 +103,6 @@ export default function Toolbar({
         </li>
       </ul>
       <div className="flex flex-row gap-1.5 flex-wrap">
-        <SaveButton saveBoard={saveBoard} arrows={arrows} />
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
@@ -129,6 +137,8 @@ export default function Toolbar({
                 setArrows={setArrows}
                 shapes={shapes}
                 shapeRefs={shapeRefs}
+                stageRef={stageRef}
+                stageSize={stageSize}
               />
             </li>
           </ul>
@@ -163,7 +173,7 @@ export default function Toolbar({
             <NotebookText size={18} />
           </button>
         </div>
-        <ToggleTheme/>
+        <ToggleTheme />
       </div>
     </div>
   );

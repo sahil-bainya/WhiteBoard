@@ -24,7 +24,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
   };
   return (
     <div>
-      <div className="tabs tabs-box w-full gap-3 p-3! bg-base-300 border border-primary/50">
+      <div className="tabs tabs-box w-full gap-3 p-3! bg-base-300 border border-primary/50 ">
         <input
           type="radio"
           name="my_tabs_6"
@@ -32,7 +32,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
           aria-label="Notes"
           defaultChecked
         />
-        <div className="tab-content bg-base-100 border-base-300 p-2!">
+        <div className="tab-content bg-base-100 border-base-300 p-2! h-64 ">
           <textarea
             name="Notes"
             value={notes}
@@ -49,7 +49,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
           aria-label="Link"
           defaultChecked
         />
-        <div className="tab-content bg-base-100 border-base-300 p-2!">
+        <div className="tab-content bg-base-100 border-base-300 p-2! h-64 overflow-y-auto">
           <ul className="list bg-base-100 rounded-box shadow-md gap-2!">
             {links.map((link) => (
               <li
@@ -60,7 +60,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
                   href={link.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="link link-info link-hover text-[15px]"
+                  className="link text-blue-500 link-hover text-[15px]"
                 >
                   {link.url}
                 </a>
@@ -95,7 +95,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
           className="tab px-3! text-lg font-bold rounded-full"
           aria-label="Code"
         />
-        <div className="tab-content bg-base-100 border-base-300 rounded-md">
+        <div className="tab-content bg-base-100 border-base-300 rounded-md h-64 overflow-y-auto">
           <div>
             <label htmlFor="Code"></label>
             <CodeEditor
@@ -104,7 +104,7 @@ export default function ContextPanel({ shape, onClose, onSave }) {
               placeholder="Write code here"
               onChange={(e) => setCode(e.target.value)}
               data-color-mode={(theme === "light" || theme==="autumn") ? "light" : "dark"}
-              className="h-full font-mono text-md rounded-md"
+              className="h-full font-mono text-lg! rounded-md"
               
             />
           </div>

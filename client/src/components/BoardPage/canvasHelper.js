@@ -192,3 +192,46 @@ export const getTextPosition = (shape) => {
 
   return { x: shape.x, y: shape.y, width: 100 };
 };
+
+
+
+export const getExistingContentBounds = (shapes) => {
+  if (shapes.length === 0) {
+    return null; // canvas-khali-hai
+  }
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+  shapes.forEach((shape) => {
+    let shapeMinX, shapeMaxX, shapeMinY, shapeMaxY;
+
+    if (shape.type === "circle" || shape.type === "ellipse") {
+      const rx = shape.radiusX || shape.radius || 50;
+      const ry = shape.radiusY || shape.radius || 50;
+      shapeMinX = shape.x - rx;
+      shapeMaxX = shape.x + rx;
+      shapeMinY = shape.y - ry;
+      shapeMaxY = shape.y + ry;
+    } else if (shape.points) {
+      const xs = shape.points.filter((_, i) => i % 2 === 0);
+      const ys = shape.points.filter((_, i) => i % 2 === 1);
+      shapeMinX = shape.x + Math.min(...xs);
+      shapeMaxX = shape.x + Math.max(...xs);
+      shapeMinY = shape.y + Math.min(...ys);
+      shapeMaxY = shape.y + Math.max(...ys);
+    } else {
+      // rect, roundedRect
+      shapeMinX = shape.x;
+      shapeMaxX = shape.x + (shape.width || 100);
+      shapeMinY = shape.y;
+      shapeMaxY = shape.y + (shape.height || 80);
+    }
+
+    minX = Math.min(minX, shapeMinX);
+    maxX = Math.max(maxX, shapeMaxX);
+    minY = Math.min(minY, shapeMinY);
+    maxY = Math.max(maxY, shapeMaxY);
+  });
+
+  return { minX, minY, maxX, maxY };
+};

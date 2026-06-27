@@ -175,7 +175,7 @@ export default function Board() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
       {/* TOP BAR — canvas ke upar, apni height occupy kare */}
-      <div ref={toolbarRef} className="flex-shrink-0 z-50">
+      <div ref={toolbarRef} className="shrink-0 z-50">
         <Toolbar
           loading={loading}
           handleAssist={handleAssist}
@@ -209,6 +209,8 @@ export default function Board() {
           shapeRefs={shapeRefs}
           pendingShapeType={pendingShapeType}
           setPendingShapeType={setPendingShapeType}
+          stageRef={stageRef}
+          stageSize={stageSize}
         />
       </div>
 
@@ -264,21 +266,21 @@ export default function Board() {
 
         {/* ContextPanel — bottom center, SelectionControls ke upar */}
         {contextShape && (
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 w-[35vw] max-w-xl">
-            <ContextPanel
-              shape={contextShape}
-              onClose={() => setContextShape(null)}
-              onSave={(updatedShape) => {
-                setShapes(
-                  shapes.map((s) =>
-                    s.id === updatedShape.id ? updatedShape : s,
-                  ),
-                );
-                setContextShape(null);
-              }}
-            />
-          </div>
-        )}
+  <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 w-[35vw] max-w-xl max-h-[60vh]">  {/* ← max-h-[60vh] add-kiya */}
+    <ContextPanel
+      shape={contextShape}
+      onClose={() => setContextShape(null)}
+      onSave={(updatedShape) => {
+        setShapes(
+          shapes.map((s) =>
+            s.id === updatedShape.id ? updatedShape : s,
+          ),
+        );
+        setContextShape(null);
+      }}
+    />
+  </div>
+)}
 
         {/* SelectionControls — bottom center */}
         {selectedId && (

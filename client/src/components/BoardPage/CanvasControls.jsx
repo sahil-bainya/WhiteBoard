@@ -45,14 +45,15 @@ export default function CanvasControls({
           </a>
         </li>
       </ul>
-      <label className="label">
+
+      <label className="label bg-base-300 p-2! rounded-md">
         <input
           type="checkbox"
           defaultChecked={grid}
           className="toggle toggle-sm"
           onChange={() => setGrid((prev) => !prev)}
         />
-        Show grid
+        <p>Show grid</p>
       </label>
 </div>
       

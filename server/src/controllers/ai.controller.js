@@ -157,18 +157,27 @@ Total nodes must be exactly ${shapes.length}.
 });
 
 const textToDiagram = asyncHandler(async (req, res) => {
-  const { description } = req.body;
+  const { description ,startX = 100, startY = 100} = req.body;
   if (!description || description.trim().length === 0) {
     throw new ApiError(400, "Description is required");
   }
  const prompt = `
 You are an expert at converting natural language descriptions into structured diagrams.
 
+CRITICAL RULE — READ FIRST: Every numeric value (x, y, width, height, radius, points) 
+in your final JSON output must be a single computed number. NEVER write expressions 
+like "100 + 180" or "360 + 200". If you need to calculate a position, do the math 
+in your head and write only the final integer result.
+WRONG: "x": 100 + 180 + 180
+RIGHT: "x": 460
+
 USER DESCRIPTION:
 "${description}"
 
 CANVAS GUIDELINES:
-Assume a logical canvas area of approximately 1400 x 900 units.
+Start the first shape at approximately x:${startX}, y:${startY} — this is the next 
+available empty area on the canvas. Assume a logical canvas area of approximately 
+1400 x 900 units extending from this starting point.
 Distribute shapes within this area in a way that looks natural and readable — 
 do not place all shapes in a tiny cluster, and do not spread them so far apart 
 that the diagram looks sparse or disconnected. If there are many components 
@@ -200,10 +209,7 @@ Your task:
 3. Convert this into shapes and arrows that can be rendered on a canvas
 
 RULES:
-- CRITICAL: All numeric values (x, y, width, height) MUST be final, pre-calculated numbers only. 
-  NEVER write mathematical expressions like "100 + 180" in the JSON. 
-  Always compute the result yourself before writing it (e.g. write "280", not "100 + 180").
-- Each shape's width should be based on text length (estimate: text length * 9 + 40, minimum 120, maximum 280)
+- Each shape's width should be based on text length (estimate: text length * 7 + 30, minimum 40, maximum 240)
 - Use consistent height of 70 for rect/roundedRect shapes; for diamond/ellipse/circle, 
   use a radius or equivalent sizing of roughly 50-70 so the label fits comfortably
 - Arrange shapes in a logical flow — left-to-right for processes, top-to-bottom for hierarchies
@@ -224,6 +230,11 @@ SHAPE-SPECIFIC JSON FORMATS:
 - For "diamond": use "x", "y", and "points" as an array of 8 numbers representing 
   4 relative vertices, e.g. "points": [0, -40, 40, 0, 0, 40, -40, 0]
 Do not mix formats — only include the properties relevant to the chosen shape type.
+
+FINAL REMINDER BEFORE YOU OUTPUT: Every x, y, width, height, radius, and point value 
+below must be a plain number with no arithmetic operators (+, -, *, /) anywhere in 
+the JSON. Double-check your output before finalizing.
+
 Return ONLY this JSON, nothing else:
 {
   "shapes": [

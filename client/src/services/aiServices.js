@@ -10,8 +10,8 @@ const messCleanup = async (shapes, arrows) => {
   return response.data.data;
 };
 
-const textTodiagram = async (description)=>{
-  const response = await api.post("ai/text-to-diagram",{description})
+const textTodiagram = async (description,startX = 100, startY = 100)=>{
+  const response = await api.post("ai/text-to-diagram",{description,startX,startY})
   return response.data.data;
 }
 export { architectureAssist, messCleanup ,textTodiagram};

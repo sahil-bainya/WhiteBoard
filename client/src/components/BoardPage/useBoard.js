@@ -459,6 +459,25 @@ export function useBoard() {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
+const autoSaveTimer = useRef(null);
+const isInitialLoad = useRef(true); // taaki "load-hote-hi-save"-na-ho-jaaye
+
+useEffect(() => {
+  // pehli-baar-jab-board-load-hota-hai, "shapes"-empty-se-populate-hota-hai — yeh-save-trigger-nahi-karna
+  if (isInitialLoad.current) {
+    isInitialLoad.current = false;
+    return;
+  }
+
+  if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+
+  autoSaveTimer.current = setTimeout(() => {
+    saveBoard(arrows); 
+  }, 6000); // 1.5-second-debounce
+
+  return () => clearTimeout(autoSaveTimer.current);
+}, [shapes, arrows,saveBoard]);
+
   return {
     saveHistory,
     zoomIn,
