@@ -1,6 +1,36 @@
 #Canvas {
   background-size: 35px 35px;
   background-image:
-    linear-gradient(to right, rgb(185, 184, 184) 0.5px, transparent 1px),
-    linear-gradient(to bottom, rgb(167, 167, 167) 0.5px, transparent 1px);
+    linear-gradient(to right, rgba(104, 104, 104, 0.2) 0.5px, transparent 1px),
+    linear-gradient(to bottom, rgba(116, 116, 116, 0.2) 0.5px, transparent 1px);
 }
+
+
+
+  .grid-btn input { display: none; }
+  
+  .grid-btn label {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    border: 1.5px solid #00000020;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+  }
+
+  /* Light mode */
+  @media (prefers-color-scheme: light) {
+    .grid-btn label { color: #555; border-color: #00000015; }
+    .grid-btn input:checked + label { color: rgb(77, 124, 255); border-color: rgb(77, 124, 255); box-shadow: 0 0 6px rgba(77,124,255,0.3); }
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .grid-btn label { color: #aaa; border-color: #ffffff20; }
+    .grid-btn input:checked + label { color: rgb(73, 122, 255); border-color: rgb(77, 124, 255); box-shadow: 0 0 6px rgba(77,124,255,0.4); }
+  }

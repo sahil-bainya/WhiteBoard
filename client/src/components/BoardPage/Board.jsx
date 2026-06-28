@@ -58,6 +58,10 @@ export default function Board() {
     setCanvasChangedSinceAI,
     pendingShapeType,
     setPendingShapeType,
+    isDrawing,
+    startFreehandDraw,
+    continueFreehandDraw,
+    endFreehandDraw,
   } = useBoard();
 
   const [loading, setLoading] = useState(false); // for cleanup
@@ -211,6 +215,7 @@ export default function Board() {
           setPendingShapeType={setPendingShapeType}
           stageRef={stageRef}
           stageSize={stageSize}
+          connectingFrom={connectingFrom}
         />
       </div>
 
@@ -239,6 +244,11 @@ export default function Board() {
             addShape={addShape}
             pendingShapeType={pendingShapeType}
             setPendingShapeType={setPendingShapeType}
+            tool={tool}
+            isDrawing={isDrawing}
+            startFreehandDraw={startFreehandDraw}
+            continueFreehandDraw={continueFreehandDraw}
+            endFreehandDraw={endFreehandDraw}
           />
         </div>
 
@@ -266,21 +276,23 @@ export default function Board() {
 
         {/* ContextPanel — bottom center, SelectionControls ke upar */}
         {contextShape && (
-  <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 w-[35vw] max-w-xl max-h-[60vh]">  {/* ← max-h-[60vh] add-kiya */}
-    <ContextPanel
-      shape={contextShape}
-      onClose={() => setContextShape(null)}
-      onSave={(updatedShape) => {
-        setShapes(
-          shapes.map((s) =>
-            s.id === updatedShape.id ? updatedShape : s,
-          ),
-        );
-        setContextShape(null);
-      }}
-    />
-  </div>
-)}
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 w-[35vw] max-w-xl max-h-[60vh]">
+            {" "}
+            {/* ← max-h-[60vh] add-kiya */}
+            <ContextPanel
+              shape={contextShape}
+              onClose={() => setContextShape(null)}
+              onSave={(updatedShape) => {
+                setShapes(
+                  shapes.map((s) =>
+                    s.id === updatedShape.id ? updatedShape : s,
+                  ),
+                );
+                setContextShape(null);
+              }}
+            />
+          </div>
+        )}
 
         {/* SelectionControls — bottom center */}
         {selectedId && (
@@ -292,6 +304,11 @@ export default function Board() {
             <SelectionControls
               shapes={shapes}
               selectedId={selectedId}
+              tool={tool}  
+      // pencilColor={pencilColor}
+      // setPencilColor={setPencilColor}
+      // pencilStrokeWidth={pencilStrokeWidth}
+      // setPencilStrokeWidth={setPencilStrokeWidth}
               setShapes={setShapes}
               saveHistory={saveHistory}
               setContextShape={setContextShape}

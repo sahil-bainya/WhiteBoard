@@ -19,7 +19,7 @@ export default function SelectionControls({
   selectedId,
   setShapes,
   saveHistory,
-  setContextShape
+  setContextShape,tool
 }) {
   const selectedShape = shapes.find((s) => s.id === selectedId);
   if (!selectedShape) return null;

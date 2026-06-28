@@ -6,7 +6,7 @@ import {
   Minus,
   Diamond as DiamondIcon,
   Ellipse as EllipseIcon,
-  Triangle,
+  Triangle,Pencil 
 } from "lucide-react";
 
 import { Rect, Circle, Text, Arrow, Line, Ellipse } from "react-konva";
@@ -137,4 +137,18 @@ export const SHAPE_CONFIG = {
     datatip: "Parallelogram",
     getProps: (el) => ({ points: el.points, closed: el.closed }),
   },
+  freehand: {
+  icon: <Pencil size={18} />,
+  defaults: {
+    points: [],  // ← khali-array-se-shuru-hoga, drawing-ke-dauran-fill-hoga
+    stroke: "#000000",
+    strokeWidth: 3,
+    lineCap: "round",
+    lineJoin: "round",
+    text: "",  // (label-ki-zarurat-nahi-iss-shape-ko, lekin-consistency-ke-liye-rakh-sakte-ho)
+  },
+  Component: Line,  // ← Konva-ka-Line-hi-use-hoga, jaisa-arrow/diamond-mein-tha
+  datatip: "Pencil",
+  getProps: (el) => ({ points: el.points, strokeWidth: el.strokeWidth, lineCap: el.lineCap, lineJoin: el.lineJoin }),
+},
 };

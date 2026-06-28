@@ -6,12 +6,15 @@ import {
   ImageDown,
   Download,
   Brain,
+  Pencil,
   ChevronLeft,
+  BrushCleaning,
 } from "lucide-react";
 import TextToDiagram from "./TextToDiagram.jsx";
 import "./Toolbar.css";
 import { useNavigate } from "react-router-dom";
 import { ToggleTheme } from "../";
+import { useSelector } from "react-redux";
 export default function Toolbar({
   loading,
   handleAssist,
@@ -35,9 +38,11 @@ export default function Toolbar({
   setPendingShapeType,
   pendingShapeType,
   stageRef,
-  stageSize,
+  stageSize,connectingFrom
 }) {
   const navigate = useNavigate();
+  const theme = useSelector((state) => state.theme.mode);
+
   return (
     <div className="flex items-center justify-between w-auto m-5! ">
       <div className="flex gap-2">
@@ -70,30 +75,52 @@ export default function Toolbar({
         )}
       </div>
       <ul className="menu menu-horizontal bg-base-300 rounded-box mt-6 flex gap-3 p-1! border border-primary/40">
-        {Object.entries(SHAPE_CONFIG).map(([type, config]) => (
-          <li>
-            <div className="tooltip tooltip-bottom" data-tip={config.datatip}>
-              <button
-                key={type}
-                onClick={() => setPendingShapeType(type)}
-                className={
-                  pendingShapeType === type
-                    ? "bg-primary p-2! rounded-md text-primary-content"
-                    : " p-2!"
-                }
-              >
-                {config.icon}
-              </button>
-            </div>
-          </li>
-        ))}
+        {Object.entries(SHAPE_CONFIG)
+          .filter(([type]) => type !== "freehand")
+          .map(([type, config]) => (
+            <li>
+              <div className="tooltip tooltip-bottom" data-tip={config.datatip}>
+                <button
+                  key={type}
+                  onClick={() =>{
+                    
+                     setTool( "select")
+                    setPendingShapeType(type)}
+                     }
+                  className={
+                    pendingShapeType === type
+                      ? "bg-primary p-2! rounded-md text-primary-content"
+                      : " p-2!"
+                  }
+                >
+                  {config.icon}
+                </button>
+              </div>
+            </li>
+          ))}
+        <li>
+          <div className="tooltip" data-tip="Pencil">
+            <button
+              onClick={() =>
+                setTool(tool === "freehand" ? "select" : "freehand")
+              }
+              className={
+                tool === "freehand"
+                  ? "bg-primary p-2! rounded-md text-primary-content"
+                  : "p-2!"
+              }
+            >
+              <Pencil size={18} />
+            </button>
+          </div>
+        </li>
         <li>
           <div className="tooltip" data-tip="Connect">
             <button
               onClick={() => setTool(tool === "connect" ? "select" : "connect")}
               className={
                 tool === "connect"
-                  ? "bg-primary p-2! rounded-md text-primary-content"
+                  ? connectingFrom ? "bg-primary/40 p-2! rounded-md text-primary-content":"bg-primary p-2! rounded-md text-primary-content"
                   : "p-2!"
               }
             >
@@ -110,14 +137,16 @@ export default function Toolbar({
             className="tooltip tooltip-bottom"
             data-tip="use AI features"
           >
-            <button className="btn btn-sm btn-ghost p-5! bg-base-300 rounded-xl">
+            <button
+              className={`btn btn-sm btn-ghost p-5! bg-base-300 rounded-xl ${theme === "dark" && "border border-primary/40"}`}
+            >
               <Brain size={18} />
               AI
             </button>
           </div>
           <ul
             tabIndex="-1"
-            className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+            className={`dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm ${theme === "dark" && "border border-primary/40"}`}
           >
             <li className="tooltip" data-tip="Get AI suggestions">
               <Button onClick={handleAssist} children="Assist"></Button>
@@ -147,7 +176,9 @@ export default function Toolbar({
           className="dropdown dropdown-end tooltip tooltip-bottom"
           data-tip="Export"
         >
-          <button className="btn btn-sm btn-ghost  bg-base-300 rounded-xl py-5! px-3!">
+          <button
+            className={`btn btn-sm btn-ghost  bg-base-300 rounded-xl py-5! px-3! ${theme === "dark" && "border border-primary/40"}`}
+          >
             <ImageDown size={18} />
           </button>
           <ul className="dropdown-content menu bg-base-200 rounded-box w-max p-2!">
@@ -165,7 +196,7 @@ export default function Toolbar({
         </div>
         <div className="tooltip tooltip-bottom" data-tip="Notes">
           <button
-            className={`btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3! ${notesShowing && "hidden"}`}
+            className={`btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3! ${notesShowing && "hidden"} ${theme === "dark" && "border border-primary/40"}`}
             onClick={() => {
               setNotesShowing((prev) => !prev);
             }}
@@ -173,8 +204,25 @@ export default function Toolbar({
             <NotebookText size={18} />
           </button>
         </div>
+        <div className="tooltip tooltip-bottom" data-tip="Erase whole canvas">
+          <button
+            className={`btn btn-sm btn-ghost bg-base-300 rounded-xl py-5! px-3!  ${theme === "dark" && "border border-primary/40"}`}
+            onClick={() => {
+              saveHistory();
+              setArrows([]);
+              setShapes([]);
+            }}
+          >
+            <BrushCleaning size={18} />
+          </button>
+        </div>
         <ToggleTheme />
       </div>
     </div>
   );
 }
+
+
+
+
+                

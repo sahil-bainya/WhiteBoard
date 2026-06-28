@@ -476,9 +476,57 @@ useEffect(() => {
   }, 6000); // 1.5-second-debounce
 
   return () => clearTimeout(autoSaveTimer.current);
-}, [shapes, arrows,saveBoard]);
+}, [shapes, arrows]);
 
+const [isDrawing, setIsDrawing] = useState(false);
+const currentFreehandId = useRef(null); // jo-shape-abhi-draw-ho-rahi-hai, uski-id-yaad-rakhne-ke-liye
+
+const startFreehandDraw = (x, y) => {
+  saveHistory();
+  const id = crypto.randomUUID();
+  currentFreehandId.current = id;
+  const color = getDefaultStrokeColor();
+
+  setShapes((prev) => [
+    ...prev,
+    {
+      id,
+      type: "freehand",
+      x: 0, // freehand-ke-liye-x,y-ka-koi-special-matlab-nahi, points-absolute-hain
+      y: 0,
+      points: [x, y], // ← shuru-ka-pehla-point
+      stroke: color,
+      strokeWidth: 3,
+      lineCap: "round",
+      lineJoin: "round",
+      isDefaultColor: true,
+      context: { notes: [], links: [], code: "" },
+    },
+  ]);
+  setIsDrawing(true);
+};
+
+const continueFreehandDraw = (x, y) => {
+  if (!isDrawing || !currentFreehandId.current) return;
+
+  setShapes((prev) =>
+    prev.map((s) =>
+      s.id === currentFreehandId.current
+        ? { ...s, points: [...s.points, x, y] } // ← naya-point-add-karte-jao
+        : s
+    )
+  );
+};
+
+const endFreehandDraw = () => {
+  setIsDrawing(false);
+  currentFreehandId.current = null;
+};
   return {
+    isDrawing,
+  startFreehandDraw,
+  continueFreehandDraw,
+  endFreehandDraw,
     saveHistory,
     zoomIn,
     zoomOut,

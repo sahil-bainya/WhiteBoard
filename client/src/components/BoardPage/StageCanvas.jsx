@@ -21,45 +21,69 @@ export default function StageCanvas({
   setPendingShapeType,
   pendingShapeType,
   addShape,
+  tool,
+  isDrawing,
+  startFreehandDraw,
+  continueFreehandDraw,
+  endFreehandDraw,
 }) {
   return (
     <Stage
-      id={grid ? "Canvas" : undefined}
-      width={stageSize.width}
-      height={stageSize.height}
-      ref={stageRef}
-      draggable
-  //     onWheel={(e) => {  // ← yeh add karo, ZOOM ke liye
-  //   e.evt.preventDefault();
-  //   const stage = stageRef.current;
-  //   const oldScale = stage.scaleX();
-  //   const pointer = stage.getPointerPosition();
-  //   const scaleBy = 1.1;
-  //   const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-  //   const clampedScale = Math.min(Math.max(newScale, 0.1), 5);
-  //   stage.scale({ x: clampedScale, y: clampedScale });
-  //   const newPos = {
-  //     x: pointer.x - (pointer.x - stage.x()) * (clampedScale / oldScale),
-  //     y: pointer.y - (pointer.y - stage.y()) * (clampedScale / oldScale),
-  //   };
-  //   stage.position(newPos);
-  // }}
-      onMouseDown={(e) => {
-        if (pendingShapeType) {
-          const pointerPos = e.target.getStage().getPointerPosition();
+  id={grid ? "Canvas" : undefined}
+  width={stageSize.width}
+  height={stageSize.height}
+  ref={stageRef}
+  draggable={!pendingShapeType && tool !== "freehand"}  
+      onWheel={(e) => {  // ← yeh add karo, ZOOM ke liye
+     e.evt.preventDefault();
+  const stage = stageRef.current;
+  
+  // Zoom hatao, sirf scroll karo
+  const dx = e.evt.deltaX;
+  const dy = e.evt.deltaY;
+  
+  stage.position({
+    x: stage.x() - dx,
+    y: stage.y() - dy,
+  });
+  }}
+  onMouseDown={(e) => {
+    if (pendingShapeType) {
+      const pointerPos = e.target.getStage().getPointerPosition();
+      const stage = e.target.getStage();
+      const transform = stage.getAbsoluteTransform().copy().invert();
+      const canvasPos = transform.point(pointerPos);
+      addShape(pendingShapeType, canvasPos.x, canvasPos.y);
+      setPendingShapeType(null);
+      return;
+    }
 
-          const stage = e.target.getStage();
-          const transform = stage.getAbsoluteTransform().copy().invert();
-          const canvasPos = transform.point(pointerPos);
+    if (tool === "freehand") {
+      const stage = e.target.getStage();
+      const pointerPos = stage.getPointerPosition();
+      const transform = stage.getAbsoluteTransform().copy().invert();
+      const canvasPos = transform.point(pointerPos);
+      startFreehandDraw(canvasPos.x, canvasPos.y);
+      return;
+    }
 
-          addShape(pendingShapeType, canvasPos.x, canvasPos.y);
-          setPendingShapeType(null);
-          return;
-        }
-
-        if (e.target === e.target.getStage()) setSelectedId(null);
-      }}
-    >
+    if (e.target === e.target.getStage()) setSelectedId(null);
+  }}
+  onMouseMove={(e) => {
+    if (tool === "freehand" && isDrawing) {
+      const stage = e.target.getStage();
+      const pointerPos = stage.getPointerPosition();
+      const transform = stage.getAbsoluteTransform().copy().invert();
+      const canvasPos = transform.point(pointerPos);
+      continueFreehandDraw(canvasPos.x, canvasPos.y);
+    }
+  }}
+  onMouseUp={() => {
+    if (tool === "freehand" && isDrawing) {
+      endFreehandDraw();
+    }
+  }}
+>
       <Layer>
         {arrows.map((arrow) => (
           <Arrow
@@ -72,22 +96,23 @@ export default function StageCanvas({
         ))}
         {shapes.map((el) => {
           const { Component, getProps } = SHAPE_CONFIG[el.type];
-           if (el.type === "diamond") {
-    console.log("Diamond props:", getProps(el));
-    console.log("Diamond el:", el);
-  }
+           const isFreehand = el.type === "freehand";  // ← yeh-add-karo
+          if (el.type === "diamond") {
+            console.log("Diamond props:", getProps(el));
+            console.log("Diamond el:", el);
+          }
           return (
             <>
               <Component
                 key={el.id}
-                draggable
+                draggable={!isFreehand} 
                 x={el.x || 0}
                 y={el.y || 0}
                 rotation={el.rotation || 0}
                 fill={el.fill}
                 stroke={el.stroke}
                 ref={(node) => (shapeRefs.current[el.id] = node)}
-                onClick={(e) => handleShapeClick(e, el.id)}
+                onClick={isFreehand ? undefined : (e) => handleShapeClick(e, el.id)}
                 onDragMove={() => updateArrowPoints(el.id)}
                 onDragEnd={(e) => handleDragEnd(e, el.id, updateArrowPoints)}
                 onTransformEnd={() => handleTransformEnd(el.id)}
@@ -96,6 +121,7 @@ export default function StageCanvas({
                     ? handleTextDblClick(el.id)
                     : setContextShape(el)
                 }
+                listening={!isFreehand} 
                 {...getProps(el)}
               />
 
